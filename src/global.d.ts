@@ -6,6 +6,7 @@ declare global {
     FS: any,
     Buffer: any,
     exitGame: Function,
+    message_queue: any[],
   }
 } 
 

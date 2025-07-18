@@ -9,7 +9,7 @@ import { gpEventType } from './gamepad';
 export const UploadFileButton: Component<{ selGame: SelectedGame, refetch: Function, class?: string }> = (props) => {
   return <>
     <input id="uploadfile" type="file" class="hidden" onChange={(evt) => selectFiles(props.selGame.platform, evt, props.refetch)} multiple />
-    <button type="button" class={"btn btn-outline btn-primary " + props.class ?? ''} onClick={() => document.getElementById('uploadfile').click()}>Upload</button>
+    <button type="button" class={"btn btn-outline btn-primary " + props.class || ''} onClick={() => document.getElementById('uploadfile').click()}>Upload</button>
   </>
 }
 
