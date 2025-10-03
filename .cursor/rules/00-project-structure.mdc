@@ -1,0 +1,20 @@
+---
+alwaysApply: true
+---
+
+# Project Structure Guide
+
+- Main web app is Next.js in [`src/app`](mdc:src/app).
+- Public static assets live in [`public`](mdc:public).
+- ES-DE compatible themes and metadata live under [`es-de_themes`](mdc:es-de_themes) and [`es-de_repo`](mdc:es-de_repo).
+- Scripts for conversion are in [`scripts`](mdc:scripts). Key scripts:
+  - [`convert-themes.ts`](mdc:scripts/convert-themes.ts)
+  - [`convert-metadata.ts`](mdc:scripts/convert-metadata.ts)
+- Shared utilities for themes are in [`src/themeUtils.ts`](mdc:src/themeUtils.ts) and [`src/theme-converter.ts`](mdc:src/theme-converter.ts).
+- Configuration: [`next.config.ts`](mdc:next.config.ts), [`tsconfig.json`](mdc:tsconfig.json), [`eslint.config.mjs`](mdc:eslint.config.mjs).
+- Documentation is in [`doc`](mdc:doc).
+
+Navigation hints:
+- UI components start in [`src/app/components`](mdc:src/app/components). Entry pages: [`src/app/page.tsx`](mdc:src/app/page.tsx), [`src/app/system/page.tsx`](mdc:src/app/system/page.tsx), [`src/app/gamelist/page.tsx`](mdc:src/app/gamelist/page.tsx), [`src/app/play/page.tsx`](mdc:src/app/play/page.tsx).
+- Theme assets emitted for the app are under [`public/themes`](mdc:public/themes).
+- Core binaries/assets used by the emulator UI live under [`public/cores`](mdc:public/cores) and [`public/assets/frontend`](mdc:public/assets/frontend).

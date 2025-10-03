@@ -1,0 +1,139 @@
+{
+    "theme": "analogue-os-menu-es-de",
+    "games": {
+        "nes": [
+        {
+            "name": "Super Mario Bros.",
+            "path": "/games/nes/super_mario_bros.nes",
+            "description": "A classic platformer where Mario must rescue Princess Toadstool from Bowser."
+        },
+        {
+            "name": "The Legend of Zelda",
+            "path": "/games/nes/zelda.nes",
+            "description": "An action-adventure game where Link must save the land of Hyrule."
+        },
+        {
+            "name": "The Legend of Mario",
+            "path": "/games/nes/zelda.nes",
+            "description": "An action-adventure game where Link must save the land of Hyrule."
+        },
+        {
+            "name": "The Legend of Link",
+            "path": "/games/nes/zelda.nes",
+            "description": "An action-adventure game where Link must save the land of Hyrule."
+        },
+        {
+            "name": "Metroid",
+            "path": "/games/nes/metroid.nes",
+            "description": "A side-scrolling action-adventure game featuring Samus Aran."
+        },
+        {
+            "name": "Super Mario Bros. 3",
+            "path": "/games/nes/super_mario_bros_3.nes",
+            "description": "The third installment in the Super Mario series with new power-ups and world map."
+        },
+        {
+            "name": "Mega Man 2",
+            "path": "/games/nes/mega_man_2.nes",
+            "description": "The sequel to Mega Man featuring improved gameplay and iconic robot masters."
+        },
+        {
+            "name": "Castlevania",
+            "path": "/games/nes/castlevania.nes",
+            "description": "A gothic horror platformer where Simon Belmont battles Dracula's forces."
+        },
+        {
+            "name": "Contra",
+            "path": "/games/nes/contra.nes",
+            "description": "A run-and-gun shooter with intense two-player cooperative action."
+        },
+        {
+            "name": "Final Fantasy",
+            "path": "/games/nes/final_fantasy.nes",
+            "description": "The original JRPG that started a legendary series with job classes and turn-based combat."
+        },
+        {
+            "name": "Donkey Kong",
+            "path": "/games/nes/donkey_kong.nes",
+            "description": "The arcade classic where Mario (then Jumpman) rescues Pauline from Donkey Kong."
+        },
+        {
+            "name": "Pac-Man",
+            "path": "/games/nes/pac_man.nes",
+            "description": "The iconic arcade maze game where Pac-Man must eat all the dots while avoiding ghosts."
+        },
+        {
+            "name": "Tetris",
+            "path": "/games/nes/tetris.nes",
+            "description": "The addictive puzzle game where players arrange falling blocks to complete lines."
+        },
+        {
+            "name": "Kirby's Adventure",
+            "path": "/games/nes/kirbys_adventure.nes",
+            "description": "Kirby gains new abilities by inhaling enemies in this platformer adventure."
+        }
+        ],
+        "gba": [
+        {
+            "name": "Pokémon Ruby",
+            "path": "/games/gba/pokemon_ruby.gba",
+            "description": "An RPG where players catch and train Pokémon to become the Champion."
+        },
+        {
+            "name": "Street Fighter Alpha 3",
+            "path": "/games/gba/sfa3.gba",
+            "description": "A action-adventure game featuring Samus Aran."
+        },
+        {
+            "name": "Metroid Fusion",
+            "path": "/games/gba/metroid_fusion.gba",
+            "description": "A side-scrolling action-adventure game featuring Samus Aran."
+        },
+        {
+            "name": "The Legend of Zelda: The Minish Cap",
+            "path": "/games/gba/zelda_minish_cap.gba",
+            "description": "Link shrinks to tiny size to save Princess Zelda and the land of Hyrule."
+        },
+        {
+            "name": "Mario Kart: Super Circuit",
+            "path": "/games/gba/mario_kart_super_circuit.gba",
+            "description": "Race as Mario characters on kart tracks mixed with classic Mario levels."
+        },
+        {
+            "name": "Golden Sun",
+            "path": "/games/gba/golden_sun.gba",
+            "description": "A fantasy RPG featuring a young adept who can control the elements."
+        },
+        {
+            "name": "Advance Wars",
+            "path": "/games/gba/advance_wars.gba",
+            "description": "A turn-based tactical warfare game with military units and strategic combat."
+        },
+        {
+            "name": "Fire Emblem",
+            "path": "/games/gba/fire_emblem.gba",
+            "description": "A tactical RPG where units can permanently die in battle."
+        },
+        {
+            "name": "Super Mario Advance 4: Super Mario Bros. 3",
+            "path": "/games/gba/super_mario_advance_4.gba",
+            "description": "Enhanced version of Super Mario Bros. 3 with new features and e-Reader support."
+        },
+        {
+            "name": "Metroid: Zero Mission",
+            "path": "/games/gba/metroid_zero_mission.gba",
+            "description": "A remake of the original Metroid with new areas and improvements."
+        },
+        {
+            "name": "Kirby & the Amazing Mirror",
+            "path": "/games/gba/kirby_amazing_mirror.gba",
+            "description": "Kirby explores a mysterious mirror world to find his fragmented self."
+        },
+        {
+            "name": "WarioWare, Inc.: Mega Microgames!",
+            "path": "/games/gba/warioware_mega_microgames.gba",
+            "description": "A collection of fast-paced microgames starring the greedy Wario."
+        }
+        ]
+    }
+}

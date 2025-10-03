@@ -1,0 +1,1017 @@
+{
+  "name": "analogue-os-menu-es-de",
+  "variables": {
+    "font": "./_inc/fonts/AnalogueOS-Regular.otf",
+    "spacerImage": "./_inc/images/space.png",
+    "colorSchemes": {
+      "dark": {
+        "backgroundColor": "000000",
+        "listSelectedColor": "000000",
+        "listSelectedBackgroundColor": "fafafa",
+        "listUnselectedColor": "fafafa",
+        "gridGameName": "fafafa",
+        "gridTextColor": "000000",
+        "gridTextBackgroundColor": "fafafa",
+        "carouselGameName": "fafafa",
+        "carouselGameSystemName": "4a4a4a",
+        "helpIconColor": "7a7a7a",
+        "helpTextColor": "9a9a9a",
+        "statusColor": "9a9a9a"
+      },
+      "custom": {
+        "colorSchemePath": "./theme-customizations/colors-custom.xml"
+      },
+      "light": {
+        "backgroundColor": "e5e5e5",
+        "listSelectedColor": "e5e5e5",
+        "listSelectedBackgroundColor": "000000",
+        "listUnselectedColor": "000000",
+        "gridGameName": "000000",
+        "gridTextColor": "e5e5e5",
+        "gridTextBackgroundColor": "000000",
+        "carouselGameName": "000000",
+        "carouselGameSystemName": "6a6a6a",
+        "helpIconColor": "5a5a5a",
+        "helpTextColor": "3a3a3a",
+        "statusColor": "3a3a3a"
+      }
+    },
+    "colorSchemePath": "./colors.xml",
+    "backgroundColor": "000000",
+    "listSelectedColor": "000000",
+    "listSelectedBackgroundColor": "fafafa",
+    "listUnselectedColor": "fafafa",
+    "gridGameName": "fafafa",
+    "gridTextColor": "000000",
+    "gridTextBackgroundColor": "fafafa",
+    "carouselGameName": "fafafa",
+    "carouselGameSystemName": "4a4a4a",
+    "helpIconColor": "7a7a7a",
+    "helpTextColor": "9a9a9a",
+    "statusColor": "9a9a9a"
+  },
+  "capabilities": {
+    "variants": [
+      "gamelist-list",
+      "gamelist-carousel",
+      "gamelist-grid"
+    ],
+    "colorSchemes": [
+      "dark",
+      "light",
+      "custom"
+    ],
+    "aspectRatios": [
+      "16:9",
+      "16:10",
+      "3:2",
+      "4:3",
+      "19.5:9",
+      "1:1"
+    ]
+  },
+  "views": [
+    {
+      "name": "system",
+      "elements": [
+        {
+          "name": "clock-menu-view",
+          "type": "clock",
+          "properties": {
+            "scope": "menu",
+            "origin": "0 0",
+            "pos": "0.0075 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.02 0.01",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "clock",
+          "type": "clock",
+          "properties": {
+            "scope": "view",
+            "opacity": "0"
+          }
+        },
+        {
+          "name": "system-status-menu-view",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "menu",
+            "origin": "1 0",
+            "pos": "0.99 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.0075 0.02",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "system-status",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "view",
+            "origin": "1 0.5",
+            "textRelativeScale": "0.7",
+            "fontPath": "${font}",
+            "color": "${statusColor}",
+            "customIcon": [
+              {
+                "_": "./_inc/images/icon-bluetooth.svg",
+                "icon": "icon_bluetooth"
+              },
+              {
+                "_": "./_inc/images/icon-wifi.svg",
+                "icon": "icon_wifi"
+              },
+              {
+                "_": "./_inc/images/icon-cellular.svg",
+                "icon": "icon_cellular"
+              },
+              {
+                "_": "./_inc/images/icon-battery-charging.svg",
+                "icon": "icon_battery_charging"
+              },
+              {
+                "_": "./_inc/images/icon-battery-full.svg",
+                "icon": "icon_battery_full"
+              },
+              {
+                "_": "./_inc/images/icon-battery-high.svg",
+                "icon": "icon_battery_high"
+              },
+              {
+                "_": "./_inc/images/icon-battery-medium.svg",
+                "icon": "icon_battery_medium"
+              },
+              {
+                "_": "./_inc/images/icon-battery-low.svg",
+                "icon": "icon_battery_low"
+              }
+            ]
+          }
+        },
+        {
+          "name": "help-menu-view",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "menu",
+            "origin": "0.5 1",
+            "pos": "0.5 0.9875",
+            "iconColor": "cccccc",
+            "textColor": "cccccc",
+            "backgroundColor": "222222",
+            "backgroundHorizontalPadding": "0.01 0.01",
+            "backgroundVerticalPadding": "0.015 0.02",
+            "backgroundCornerRadius": "0.005",
+            "entryRelativeScale": "0.9"
+          }
+        },
+        {
+          "name": "help-view",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "view",
+            "origin": "0 0.5",
+            "fontPath": "${font}",
+            "textColor": "${helpTextColor}",
+            "iconColor": "${helpIconColor}",
+            "letterCase": "capitalize",
+            "entryRelativeScale": "0.7",
+            "entries": "start,back,a,b",
+            "customButtonIcon": [
+              {
+                "_": "./_inc/images/help-thumbstick-click.svg",
+                "button": "thumbstick_click"
+              },
+              {
+                "_": "./_inc/images/help-button-dpad-up-down.svg",
+                "button": "dpad_updown"
+              },
+              {
+                "_": "./_inc/images/help-button-dpad-left-right.svg",
+                "button": "dpad_leftright"
+              },
+              {
+                "_": "./_inc/images/help-button-dpad.svg",
+                "button": "dpad_all"
+              },
+              {
+                "_": "./_inc/images/help-button-l.svg",
+                "button": "button_l"
+              },
+              {
+                "_": "./_inc/images/help-button-lt.svg",
+                "button": "button_lt"
+              },
+              {
+                "_": "./_inc/images/help-button-r.svg",
+                "button": "button_r"
+              },
+              {
+                "_": "./_inc/images/help-button-rt.svg",
+                "button": "button_rt"
+              },
+              {
+                "_": "./_inc/images/help-button-lr.svg",
+                "button": "button_lr"
+              },
+              {
+                "_": "./_inc/images/help-button-ltrt.svg",
+                "button": "button_ltrt"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_PS123"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_PS4"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_PS5"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_XBOX360"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_PS123"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_PS4"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_PS5"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_XBOX360"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_b_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_b_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_b_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_b_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_a_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_a_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_a_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_a_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_y_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_y_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_y_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_y_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_x_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_x_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_x_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_x_SNES"
+              }
+            ]
+          }
+        },
+        {
+          "name": "background",
+          "type": "image",
+          "properties": {
+            "pos": "0 0",
+            "size": "1 1",
+            "tile": "true",
+            "color": "${backgroundColor}",
+            "path": "${spacerImage}",
+            "zIndex": "0"
+          }
+        },
+        {
+          "name": "item-list",
+          "type": "textlist",
+          "properties": {
+            "fontPath": "${font}",
+            "selectorColor": "00000000",
+            "selectedBackgroundColor": "${listSelectedBackgroundColor}",
+            "selectedColor": "${listSelectedColor}",
+            "primaryColor": "${listUnselectedColor}",
+            "secondaryColor": "${listUnselectedColor}",
+            "letterCaseAutoCollections": "capitalize",
+            "letterCaseSystemNameSuffix": "lowercase",
+            "selectedBackgroundCornerRadius": "0.05",
+            "indicators": "ascii",
+            "systemNameSuffix": "false",
+            "collectionIndicators": "ascii",
+            "zIndex": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gamelist",
+      "elements": [
+        {
+          "name": "clock-menu-view",
+          "type": "clock",
+          "properties": {
+            "scope": "menu",
+            "origin": "0 0",
+            "pos": "0.0075 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.02 0.01",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "clock",
+          "type": "clock",
+          "properties": {
+            "scope": "view",
+            "opacity": "0"
+          }
+        },
+        {
+          "name": "system-status-menu-view",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "menu",
+            "origin": "1 0",
+            "pos": "0.99 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.0075 0.02",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "system-status",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "view",
+            "origin": "1 0.5",
+            "textRelativeScale": "0.7",
+            "fontPath": "${font}",
+            "color": "${statusColor}",
+            "customIcon": [
+              {
+                "_": "./_inc/images/icon-bluetooth.svg",
+                "icon": "icon_bluetooth"
+              },
+              {
+                "_": "./_inc/images/icon-wifi.svg",
+                "icon": "icon_wifi"
+              },
+              {
+                "_": "./_inc/images/icon-cellular.svg",
+                "icon": "icon_cellular"
+              },
+              {
+                "_": "./_inc/images/icon-battery-charging.svg",
+                "icon": "icon_battery_charging"
+              },
+              {
+                "_": "./_inc/images/icon-battery-full.svg",
+                "icon": "icon_battery_full"
+              },
+              {
+                "_": "./_inc/images/icon-battery-high.svg",
+                "icon": "icon_battery_high"
+              },
+              {
+                "_": "./_inc/images/icon-battery-medium.svg",
+                "icon": "icon_battery_medium"
+              },
+              {
+                "_": "./_inc/images/icon-battery-low.svg",
+                "icon": "icon_battery_low"
+              }
+            ]
+          }
+        },
+        {
+          "name": "help-menu-view",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "menu",
+            "origin": "0.5 1",
+            "pos": "0.5 0.9875",
+            "iconColor": "cccccc",
+            "textColor": "cccccc",
+            "backgroundColor": "222222",
+            "backgroundHorizontalPadding": "0.01 0.01",
+            "backgroundVerticalPadding": "0.015 0.02",
+            "backgroundCornerRadius": "0.005",
+            "entryRelativeScale": "0.9"
+          }
+        },
+        {
+          "name": "help-view",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "view",
+            "origin": "0 0.5",
+            "fontPath": "${font}",
+            "textColor": "${helpTextColor}",
+            "iconColor": "${helpIconColor}",
+            "letterCase": "capitalize",
+            "entryRelativeScale": "0.7",
+            "entries": "start,back,a,b",
+            "customButtonIcon": [
+              {
+                "_": "./_inc/images/help-thumbstick-click.svg",
+                "button": "thumbstick_click"
+              },
+              {
+                "_": "./_inc/images/help-button-dpad-up-down.svg",
+                "button": "dpad_updown"
+              },
+              {
+                "_": "./_inc/images/help-button-dpad-left-right.svg",
+                "button": "dpad_leftright"
+              },
+              {
+                "_": "./_inc/images/help-button-dpad.svg",
+                "button": "dpad_all"
+              },
+              {
+                "_": "./_inc/images/help-button-l.svg",
+                "button": "button_l"
+              },
+              {
+                "_": "./_inc/images/help-button-lt.svg",
+                "button": "button_lt"
+              },
+              {
+                "_": "./_inc/images/help-button-r.svg",
+                "button": "button_r"
+              },
+              {
+                "_": "./_inc/images/help-button-rt.svg",
+                "button": "button_rt"
+              },
+              {
+                "_": "./_inc/images/help-button-lr.svg",
+                "button": "button_lr"
+              },
+              {
+                "_": "./_inc/images/help-button-ltrt.svg",
+                "button": "button_ltrt"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_PS123"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_PS4"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_PS5"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-start.svg",
+                "button": "button_start_XBOX360"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_PS123"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_PS4"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_PS5"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-back.svg",
+                "button": "button_back_XBOX360"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_b_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_b_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_b_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_b_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_a_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_a_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-east.svg",
+                "button": "button_a_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-south.svg",
+                "button": "button_a_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_y_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_y_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_y_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_y_SNES"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_x_XBOX"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_x_PS"
+              },
+              {
+                "_": "./_inc/images/help-button-north.svg",
+                "button": "button_x_switch"
+              },
+              {
+                "_": "./_inc/images/help-button-west.svg",
+                "button": "button_x_SNES"
+              }
+            ]
+          }
+        },
+        {
+          "name": "background",
+          "type": "image",
+          "properties": {
+            "pos": "0 0",
+            "size": "1 1",
+            "tile": "true",
+            "color": "${backgroundColor}",
+            "path": "${spacerImage}",
+            "zIndex": "0"
+          }
+        },
+        {
+          "name": "item-list",
+          "type": "textlist",
+          "properties": {
+            "fontPath": "${font}",
+            "selectorColor": "00000000",
+            "selectedBackgroundColor": "${listSelectedBackgroundColor}",
+            "selectedColor": "${listSelectedColor}",
+            "primaryColor": "${listUnselectedColor}",
+            "secondaryColor": "${listUnselectedColor}",
+            "letterCaseAutoCollections": "capitalize",
+            "letterCaseSystemNameSuffix": "lowercase",
+            "selectedBackgroundCornerRadius": "0.05",
+            "indicators": "ascii",
+            "systemNameSuffix": "false",
+            "collectionIndicators": "ascii",
+            "zIndex": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "all",
+      "elements": [
+        {
+          "name": "systembrowse",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/systembrowse.wav"
+          }
+        },
+        {
+          "name": "quicksysselect",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/quicksysselect.wav"
+          }
+        },
+        {
+          "name": "select",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/select.wav"
+          }
+        },
+        {
+          "name": "back",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/back.wav"
+          }
+        },
+        {
+          "name": "scroll",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/scroll.wav"
+          }
+        },
+        {
+          "name": "favorite",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/favorite.wav"
+          }
+        },
+        {
+          "name": "launch",
+          "type": "sound",
+          "properties": {
+            "path": "./_inc/sounds/launch.wav"
+          }
+        }
+      ]
+    }
+  ],
+  "variant": [
+    {
+      "name": "gamelist-list",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "item-list",
+              "type": "textlist",
+              "properties": {
+                "pos": "0.25 0.025",
+                "size": "0.75 0.875"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "item-list",
+              "type": "textlist",
+              "properties": {
+                "pos": "0.25 0.025",
+                "size": "0.75 0.875"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gamelist-carousel",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "item-list",
+              "type": "textlist",
+              "properties": {
+                "pos": "0.25 0.025",
+                "size": "0.75 0.875"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "item-carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.25 0.025",
+                "size": "0.234375 0.875",
+                "imageType": "screenshot",
+                "maxItemCount": "3",
+                "itemSize": "0.234375 0.291666666666667",
+                "itemScale": "1",
+                "itemTransitions": "animate",
+                "unfocusedItemSaturation": "0",
+                "unfocusedItemOpacity": "0.5",
+                "fastScrolling": "true",
+                "textColor": "${gridTextColor}",
+                "textBackgroundColor": "${gridTextBackgroundColor}",
+                "fontPath": "${font}",
+                "fontSize": "0.033333333333333",
+                "imageFit": "cover",
+                "type": "vertical",
+                "color": "00000000"
+              }
+            },
+            {
+              "name": "game-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.515625 0.3375",
+                "size": "0.4375 0",
+                "metadata": "name",
+                "fontPath": "${font}",
+                "fontSize": "0.054166666666667",
+                "lineSpacing": "1",
+                "systemNameSuffix": "false",
+                "color": "${carouselGameName}"
+              }
+            },
+            {
+              "name": "game-system-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.515625 0.541666666666667",
+                "metadata": "sourceSystemFullname",
+                "fontPath": "${font}",
+                "fontSize": "0.041666666666667",
+                "lineSpacing": "1",
+                "color": "${carouselGameSystemName}",
+                "defaultValue": ":space:"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gamelist-grid",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "item-list",
+              "type": "textlist",
+              "properties": {
+                "pos": "0.25 0.025",
+                "size": "0.75 0.875"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "game-name",
+              "type": "text",
+              "properties": {
+                "size": "0.75 0.11",
+                "pos": "0.25 0.0165",
+                "container": "true",
+                "containerType": "horizontal",
+                "fontPath": "${font}",
+                "fontSize": "0.0625",
+                "lineSpacing": "1.775",
+                "color": "${gridGameName}",
+                "metadata": "name"
+              }
+            },
+            {
+              "name": "item-grid",
+              "type": "grid",
+              "properties": {
+                "pos": "0.25 0.14",
+                "size": "0.75 0.75",
+                "itemScale": "1",
+                "imageType": "screenshot",
+                "imageFit": "cover",
+                "unfocusedItemOpacity": "0.5",
+                "unfocusedItemSaturation": "0",
+                "textColor": "${gridTextColor}",
+                "textBackgroundColor": "${gridTextBackgroundColor}",
+                "fontPath": "${font}",
+                "fontSize": "0.033333333333333",
+                "rowTransitions": "animate",
+                "itemSize": "0.234375 0.233333333333333",
+                "itemSpacing": "0.015625 0.025"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "aspectRatio": [
+    {
+      "name": "4:3,16:9,16:10,1:1,3:2,19.5:9",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "item-list",
+              "type": "textlist",
+              "properties": {
+                "fontSize": "${listFontSize}",
+                "lineSpacing": "${listLineSpacing}",
+                "selectedBackgroundMargins": "${selectedBackgroundMargins}"
+              }
+            },
+            {
+              "name": "system-status",
+              "type": "systemstatus",
+              "properties": {
+                "pos": "0.9825 0.95",
+                "height": "0.04166667"
+              }
+            },
+            {
+              "name": "help-view",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.25 0.95",
+                "entrySpacing": "0.0125",
+                "iconTextSpacing": "0.00625",
+                "fontSize": "${helpsystemFontSize}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "item-list",
+              "type": "textlist",
+              "properties": {
+                "fontSize": "${listFontSize}",
+                "lineSpacing": "${listLineSpacing}",
+                "selectedBackgroundMargins": "${selectedBackgroundMargins}"
+              }
+            },
+            {
+              "name": "system-status",
+              "type": "systemstatus",
+              "properties": {
+                "pos": "0.9825 0.95",
+                "height": "0.04166667"
+              }
+            },
+            {
+              "name": "help-view",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.25 0.95",
+                "entrySpacing": "0.0125",
+                "iconTextSpacing": "0.00625",
+                "fontSize": "${helpsystemFontSize}"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": {
+        "listFontSize": "0.0625",
+        "listLineSpacing": "1.775",
+        "selectedBackgroundMargins": "0.0375 0.0375",
+        "helpsystemFontSize": "0.04166667"
+      }
+    }
+  ],
+  "assets": {
+    "images": [
+      "./_inc/images/icon-bluetooth.svg",
+      "./_inc/images/icon-wifi.svg",
+      "./_inc/images/icon-cellular.svg",
+      "./_inc/images/icon-battery-charging.svg",
+      "./_inc/images/icon-battery-full.svg",
+      "./_inc/images/icon-battery-high.svg",
+      "./_inc/images/icon-battery-medium.svg",
+      "./_inc/images/icon-battery-low.svg",
+      "./_inc/images/help-thumbstick-click.svg",
+      "./_inc/images/help-button-dpad-up-down.svg",
+      "./_inc/images/help-button-dpad-left-right.svg",
+      "./_inc/images/help-button-dpad.svg",
+      "./_inc/images/help-button-l.svg",
+      "./_inc/images/help-button-lt.svg",
+      "./_inc/images/help-button-r.svg",
+      "./_inc/images/help-button-rt.svg",
+      "./_inc/images/help-button-lr.svg",
+      "./_inc/images/help-button-ltrt.svg",
+      "./_inc/images/help-button-start.svg",
+      "./_inc/images/help-button-back.svg",
+      "./_inc/images/help-button-east.svg",
+      "./_inc/images/help-button-south.svg",
+      "./_inc/images/help-button-north.svg",
+      "./_inc/images/help-button-west.svg"
+    ],
+    "fonts": []
+  }
+}

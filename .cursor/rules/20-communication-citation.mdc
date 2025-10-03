@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+
+# Communication and Code Citation
+
+- Keep messages concise and skimmable; use `###` headings and bullet lists.
+- Format file, directory, function, and class names with backticks.
+- Cite existing code using CODE REFERENCES:
+  - Syntax:
+```
+startLine:endLine:filepath
+// code here
+```
+- Show proposed/new code in standard fenced blocks with a language tag.
+- Never mix formats; never add line numbers inside code blocks.
+- Do not indent triple backticks; place them at column 0.
+- Prefer semantic summaries over step-by-step logs unless asked.

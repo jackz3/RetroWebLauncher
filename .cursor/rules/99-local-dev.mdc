@@ -1,0 +1,12 @@
+---
+description: Local development quickstart and norms
+---
+
+# Local Development
+
+- Node and tooling: see [`package.json`](mdc:package.json) for scripts.
+- Next.js app root: [`src/app`](mdc:src/app). Entry layout at [`src/app/layout.tsx`](mdc:src/app/layout.tsx).
+- Run dev server: `npm run dev`.
+- Lint before commit: `npm run lint`.
+- When editing, avoid large, unrelated refactors; keep edits scoped.
+- Prefer absolute paths in workspace when scripting.

@@ -1,0 +1,1244 @@
+{
+  "name": "mania-menu-es-de",
+  "variables": {
+    "spacerImage": "./_inc/images/space.png",
+    "font": "./_inc/fonts/sonic-mania-bitmap.ttf",
+    "colorSchemes": {
+      "yellow": {
+        "backgroundColor": "yellow"
+      },
+      "blue": {
+        "backgroundColor": "blue"
+      },
+      "purple": {
+        "backgroundColor": "purple"
+      }
+    },
+    "backgroundColor": "yellow"
+  },
+  "capabilities": {
+    "variants": [
+      "backgroundArtVideo",
+      "backgroundArtScreenshot",
+      "backgroundArtFanart",
+      "backgroundArtCustom"
+    ],
+    "colorSchemes": [
+      "yellow",
+      "blue",
+      "purple"
+    ],
+    "aspectRatios": [
+      "16:9",
+      "16:10",
+      "4:3"
+    ]
+  },
+  "views": [
+    {
+      "name": "system",
+      "elements": [
+        {
+          "name": "clock-menu-view",
+          "type": "clock",
+          "properties": {
+            "scope": "menu",
+            "origin": "0 0",
+            "pos": "0.0075 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.02 0.01",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "clock",
+          "type": "clock",
+          "properties": {
+            "scope": "view",
+            "pos": "0.05 0.085",
+            "fontSize": "0.036",
+            "color": "111111"
+          }
+        },
+        {
+          "name": "system-status-menu-view",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "menu",
+            "origin": "1 0",
+            "pos": "0.99 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.0075 0.02",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "system-status",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "view",
+            "origin": "1 0",
+            "pos": "0.95 0.085",
+            "textRelativeScale": "0.8",
+            "height": "0.036",
+            "color": "111111",
+            "customIcon": [
+              {
+                "_": "./_inc/images/icon-bluetooth.svg",
+                "icon": "icon_bluetooth"
+              },
+              {
+                "_": "./_inc/images/icon-wifi.svg",
+                "icon": "icon_wifi"
+              },
+              {
+                "_": "./_inc/images/icon-cellular.svg",
+                "icon": "icon_cellular"
+              },
+              {
+                "_": "./_inc/images/icon-battery-charging.svg",
+                "icon": "icon_battery_charging"
+              },
+              {
+                "_": "./_inc/images/icon-battery-full.svg",
+                "icon": "icon_battery_full"
+              },
+              {
+                "_": "./_inc/images/icon-battery-high.svg",
+                "icon": "icon_battery_high"
+              },
+              {
+                "_": "./_inc/images/icon-battery-medium.svg",
+                "icon": "icon_battery_medium"
+              },
+              {
+                "_": "./_inc/images/icon-battery-low.svg",
+                "icon": "icon_battery_low"
+              }
+            ]
+          }
+        },
+        {
+          "name": "help-menu-view",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "menu",
+            "origin": "0.5 1",
+            "pos": "0.5 0.9875",
+            "iconColor": "cccccc",
+            "textColor": "cccccc",
+            "backgroundColor": "222222",
+            "backgroundHorizontalPadding": "0.01 0.01",
+            "backgroundVerticalPadding": "0.015 0.02",
+            "backgroundCornerRadius": "0.005",
+            "entryRelativeScale": "0.9"
+          }
+        },
+        {
+          "name": "help",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "view",
+            "origin": "0.5 0",
+            "textColor": "000000",
+            "iconColor": "000000",
+            "originDimmed": "0.5 0",
+            "posDimmed": "0.5 0.94",
+            "textColorDimmed": "cccccc",
+            "iconColorDimmed": "cccccc",
+            "fontSizeDimmed": "0.026",
+            "opacityDimmed": "1.0"
+          }
+        },
+        {
+          "name": "background-color",
+          "type": "image",
+          "properties": {
+            "origin": "0 0",
+            "pos": "0 0",
+            "size": "1 1",
+            "path": "${spacerImage}",
+            "tile": "true",
+            "color": "333333",
+            "zIndex": "0"
+          }
+        },
+        {
+          "name": "background-mask",
+          "type": "image",
+          "properties": {
+            "origin": "0 0",
+            "pos": "0 0",
+            "size": "1 1",
+            "zIndex": "2"
+          }
+        },
+        {
+          "name": "carousel",
+          "type": "carousel",
+          "properties": {
+            "origin": "0 0",
+            "color": "00000000",
+            "fontPath": "${font}",
+            "textColor": "ffffff",
+            "textSelectedColor": "ffffff",
+            "letterCaseAutoCollections": "capitalize",
+            "lineSpacing": "1",
+            "itemScale": "1",
+            "maxItemCount": "4.6555",
+            "itemTransitions": "instant",
+            "unfocusedItemOpacity": "0.3",
+            "type": "vertical",
+            "itemHorizontalAlignment": "left",
+            "fastScrolling": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gamelist",
+      "elements": [
+        {
+          "name": "clock-menu-view",
+          "type": "clock",
+          "properties": {
+            "scope": "menu",
+            "origin": "0 0",
+            "pos": "0.0075 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.02 0.01",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "clock",
+          "type": "clock",
+          "properties": {
+            "scope": "view",
+            "pos": "0.05 0.085",
+            "fontSize": "0.036",
+            "color": "111111"
+          }
+        },
+        {
+          "name": "system-status-menu-view",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "menu",
+            "origin": "1 0",
+            "pos": "0.99 0.01",
+            "backgroundColor": "222222",
+            "color": "cccccc",
+            "backgroundHorizontalPadding": "0.0075 0.02",
+            "backgroundVerticalPadding": "0.02 0.01",
+            "backgroundCornerRadius": "0.005"
+          }
+        },
+        {
+          "name": "system-status",
+          "type": "systemstatus",
+          "properties": {
+            "scope": "view",
+            "origin": "1 0",
+            "pos": "0.95 0.085",
+            "textRelativeScale": "0.8",
+            "height": "0.036",
+            "color": "111111",
+            "customIcon": [
+              {
+                "_": "./_inc/images/icon-bluetooth.svg",
+                "icon": "icon_bluetooth"
+              },
+              {
+                "_": "./_inc/images/icon-wifi.svg",
+                "icon": "icon_wifi"
+              },
+              {
+                "_": "./_inc/images/icon-cellular.svg",
+                "icon": "icon_cellular"
+              },
+              {
+                "_": "./_inc/images/icon-battery-charging.svg",
+                "icon": "icon_battery_charging"
+              },
+              {
+                "_": "./_inc/images/icon-battery-full.svg",
+                "icon": "icon_battery_full"
+              },
+              {
+                "_": "./_inc/images/icon-battery-high.svg",
+                "icon": "icon_battery_high"
+              },
+              {
+                "_": "./_inc/images/icon-battery-medium.svg",
+                "icon": "icon_battery_medium"
+              },
+              {
+                "_": "./_inc/images/icon-battery-low.svg",
+                "icon": "icon_battery_low"
+              }
+            ]
+          }
+        },
+        {
+          "name": "help-menu-view",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "menu",
+            "origin": "0.5 1",
+            "pos": "0.5 0.9875",
+            "iconColor": "cccccc",
+            "textColor": "cccccc",
+            "backgroundColor": "222222",
+            "backgroundHorizontalPadding": "0.01 0.01",
+            "backgroundVerticalPadding": "0.015 0.02",
+            "backgroundCornerRadius": "0.005",
+            "entryRelativeScale": "0.9"
+          }
+        },
+        {
+          "name": "help",
+          "type": "helpsystem",
+          "properties": {
+            "scope": "view",
+            "origin": "0.5 0",
+            "textColor": "000000",
+            "iconColor": "000000",
+            "originDimmed": "0.5 0",
+            "posDimmed": "0.5 0.94",
+            "textColorDimmed": "cccccc",
+            "iconColorDimmed": "cccccc",
+            "fontSizeDimmed": "0.026",
+            "opacityDimmed": "1.0"
+          }
+        },
+        {
+          "name": "background-color",
+          "type": "image",
+          "properties": {
+            "origin": "0 0",
+            "pos": "0 0",
+            "size": "1 1",
+            "path": "${spacerImage}",
+            "tile": "true",
+            "color": "333333",
+            "zIndex": "0"
+          }
+        },
+        {
+          "name": "background-mask",
+          "type": "image",
+          "properties": {
+            "origin": "0 0",
+            "pos": "0 0",
+            "size": "1 1",
+            "zIndex": "2"
+          }
+        },
+        {
+          "name": "carousel",
+          "type": "carousel",
+          "properties": {
+            "origin": "0 0",
+            "color": "00000000",
+            "fontPath": "${font}",
+            "textColor": "ffffff",
+            "textSelectedColor": "ffffff",
+            "letterCaseAutoCollections": "capitalize",
+            "lineSpacing": "1",
+            "itemScale": "1",
+            "maxItemCount": "4.6555",
+            "itemTransitions": "instant",
+            "unfocusedItemOpacity": "0.3",
+            "type": "vertical",
+            "itemHorizontalAlignment": "left",
+            "fastScrolling": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "system",
+      "elements": [
+        {
+          "name": "system-name",
+          "type": "text",
+          "properties": {
+            "origin": "0.5 0",
+            "fontPath": "${font}",
+            "color": "ffffff",
+            "lineSpacing": "1",
+            "horizontalAlignment": "center"
+          }
+        },
+        {
+          "name": "system-name",
+          "type": "text",
+          "properties": {
+            "text": "ES-DE"
+          }
+        },
+        {
+          "name": "carousel",
+          "type": "carousel",
+          "properties": {
+            "text": "${system.fullName}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gamelist",
+      "elements": [
+        {
+          "name": "system-name,auto-collection-name,custom-collection-name",
+          "type": "text",
+          "properties": {
+            "origin": "0.5 0",
+            "fontPath": "${font}",
+            "color": "ffffff",
+            "lineSpacing": "1",
+            "horizontalAlignment": "center"
+          }
+        },
+        {
+          "name": "system-name",
+          "type": "text",
+          "properties": {
+            "text": "${system.fullName.noCollections}"
+          }
+        },
+        {
+          "name": "auto-collection-name",
+          "type": "text",
+          "properties": {
+            "text": "${system.fullName.autoCollections}",
+            "letterCase": "capitalize"
+          }
+        },
+        {
+          "name": "carousel",
+          "type": "carousel",
+          "properties": {
+            "imageType": "none"
+          }
+        },
+        {
+          "name": "badges",
+          "type": "badges",
+          "properties": {
+            "origin": "0 0",
+            "itemMargin": "0.004 0.004",
+            "lines": "1",
+            "itemsPerLine": "9",
+            "slots": "all",
+            "customBadgeIcon": [
+              {
+                "_": "./_inc/images/badge-folder.svg",
+                "badge": "folder"
+              },
+              {
+                "_": "./_inc/images/badge-broken.svg",
+                "badge": "broken"
+              },
+              {
+                "_": "./_inc/images/badge-completed.svg",
+                "badge": "completed"
+              },
+              {
+                "_": "./_inc/images/badge-favorite.svg",
+                "badge": "favorite"
+              },
+              {
+                "_": "./_inc/images/badge-kidgame.svg",
+                "badge": "kidgame"
+              },
+              {
+                "_": "./_inc/images/badge-collection.svg",
+                "badge": "collection"
+              },
+              {
+                "_": "./_inc/images/badge-controller.svg",
+                "badge": "controller"
+              },
+              {
+                "_": "./_inc/images/badge-altemulator.svg",
+                "badge": "altemulator"
+              },
+              {
+                "_": "./_inc/images/badge-manual.svg",
+                "badge": "manual"
+              }
+            ],
+            "controllerSize": "0.8",
+            "folderLinkSize": "0.8"
+          }
+        }
+      ]
+    }
+  ],
+  "variant": [
+    {
+      "name": "backgroundArtScreenshot",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtFanart",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtVideo",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1",
+                "delay": "3",
+                "pillarboxes": "false"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1",
+                "delay": "3",
+                "pillarboxes": "false"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtCustom",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "origin": "0 0",
+                "zIndex": "1",
+                "delay": "3",
+                "pillarboxes": "false"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtScreenshot",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "selector-random",
+              "type": "gameselector",
+              "properties": {
+                "selection": "random"
+              }
+            },
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "gameselector": "selector-random",
+                "imageType": "screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtFanart",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "selector-random",
+              "type": "gameselector",
+              "properties": {
+                "selection": "random"
+              }
+            },
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "gameselector": "selector-random",
+                "imageType": "fanart,screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtVideo",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "selector-random",
+              "type": "gameselector",
+              "properties": {
+                "selection": "random"
+              }
+            },
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "gameselector": "selector-random",
+                "imageType": "screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtCustom",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/custom-backgrounds/${system.theme}.webp"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtScreenshot",
+      "views": [
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "imageType": "screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtFanart",
+      "views": [
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "imageType": "fanart,screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtVideo",
+      "views": [
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "imageType": "screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtCustom",
+      "views": [
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "imageType": "screenshot"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtScreenshot",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtFanart",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtVideo",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "backgroundArtCustom",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "image",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-art",
+              "type": "video",
+              "properties": {
+                "cropSize": "0.6921875 0.675",
+                "pos": "0 0.263888888888889"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "aspectRatio": [
+    {
+      "name": "16:9",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-mask",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/background-mask-16-9-${backgroundColor}.svg"
+              }
+            },
+            {
+              "name": "carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.37 0.263888888888889",
+                "size": "0.64 0.675",
+                "fontSize": "0.036",
+                "itemSize": "0.42 0.097",
+                "itemDiagonalOffset": "0.082",
+                "horizontalOffset": "0.32"
+              }
+            },
+            {
+              "name": "help",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.5 0.2",
+                "fontSize": "0.02"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-mask",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/background-mask-16-9-${backgroundColor}.svg"
+              }
+            },
+            {
+              "name": "carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.37 0.263888888888889",
+                "size": "0.64 0.675",
+                "fontSize": "0.036",
+                "itemSize": "0.42 0.097",
+                "itemDiagonalOffset": "0.082",
+                "horizontalOffset": "0.32"
+              }
+            },
+            {
+              "name": "help",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.5 0.2",
+                "fontSize": "0.02"
+              }
+            }
+          ]
+        },
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "system-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.5 0.06",
+                "size": "0.32 0.09",
+                "fontSize": "0.036"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "system-name,auto-collection-name,custom-collection-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.5 0.06",
+                "size": ".32 .09",
+                "fontSize": "0.036"
+              }
+            },
+            {
+              "name": "badges",
+              "type": "badges",
+              "properties": {
+                "pos": "0.015625 0.297222222222222",
+                "size": "0.234375 0.041666666666667"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": {}
+    },
+    {
+      "name": "4:3",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-mask",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/background-mask-4-3-${backgroundColor}.svg"
+              }
+            },
+            {
+              "name": "carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.160416666666667 0.263888888888889",
+                "size": "0.853333333333333 0.675",
+                "fontSize": "0.036",
+                "itemSize": "0.56 0.097",
+                "itemDiagonalOffset": "0.109333333333333",
+                "horizontalOffset": "0.32"
+              }
+            },
+            {
+              "name": "help",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.5 0.2",
+                "fontSize": "0.02"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-mask",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/background-mask-4-3-${backgroundColor}.svg"
+              }
+            },
+            {
+              "name": "carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.160416666666667 0.263888888888889",
+                "size": "0.853333333333333 0.675",
+                "fontSize": "0.036",
+                "itemSize": "0.56 0.097",
+                "itemDiagonalOffset": "0.109333333333333",
+                "horizontalOffset": "0.32"
+              }
+            },
+            {
+              "name": "help",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.5 0.2",
+                "fontSize": "0.02"
+              }
+            }
+          ]
+        },
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "system-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.5 0.06",
+                "size": "0.426666666666667 0.09",
+                "fontSize": "0.036"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "system-name,auto-collection-name,custom-collection-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.5 0.06",
+                "size": "0.426666666666667 .09",
+                "fontSize": "0.036"
+              }
+            },
+            {
+              "name": "badges",
+              "type": "badges",
+              "properties": {
+                "pos": "0.020833333333333 0.297222222222222",
+                "size": "0.3125 0.041666666666667"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": {}
+    },
+    {
+      "name": "16:10",
+      "views": [
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "background-mask",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/background-mask-16-10-${backgroundColor}.svg"
+              }
+            },
+            {
+              "name": "carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.37 0.2875",
+                "size": "0.64 0.6075",
+                "fontSize": "0.0324",
+                "itemSize": "0.42 0.0875",
+                "itemDiagonalOffset": "0.082",
+                "horizontalOffset": "0.32"
+              }
+            },
+            {
+              "name": "help",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.5 0.23",
+                "fontSize": "0.018"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "background-mask",
+              "type": "image",
+              "properties": {
+                "path": "./_inc/images/background-mask-16-10-${backgroundColor}.svg"
+              }
+            },
+            {
+              "name": "carousel",
+              "type": "carousel",
+              "properties": {
+                "pos": "0.37 0.2875",
+                "size": "0.64 0.6075",
+                "fontSize": "0.0324",
+                "itemSize": "0.42 0.0875",
+                "itemDiagonalOffset": "0.082",
+                "horizontalOffset": "0.32"
+              }
+            },
+            {
+              "name": "help",
+              "type": "helpsystem",
+              "properties": {
+                "pos": "0.5 0.23",
+                "fontSize": "0.018"
+              }
+            }
+          ]
+        },
+        {
+          "name": "system",
+          "elements": [
+            {
+              "name": "system-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.5 0.104",
+                "size": "0.32 0.081",
+                "fontSize": "0.0324"
+              }
+            }
+          ]
+        },
+        {
+          "name": "gamelist",
+          "elements": [
+            {
+              "name": "system-name,auto-collection-name,custom-collection-name",
+              "type": "text",
+              "properties": {
+                "pos": "0.5 0.104",
+                "size": "0.32 0.081",
+                "fontSize": "0.0324"
+              }
+            },
+            {
+              "name": "badges",
+              "type": "badges",
+              "properties": {
+                "pos": "0.015625 0.3175",
+                "size": "0.234375 0.0375"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": {}
+    }
+  ],
+  "assets": {
+    "images": [
+      "./_inc/images/icon-bluetooth.svg",
+      "./_inc/images/icon-wifi.svg",
+      "./_inc/images/icon-cellular.svg",
+      "./_inc/images/icon-battery-charging.svg",
+      "./_inc/images/icon-battery-full.svg",
+      "./_inc/images/icon-battery-high.svg",
+      "./_inc/images/icon-battery-medium.svg",
+      "./_inc/images/icon-battery-low.svg",
+      "./_inc/images/background-mask-16-9-yellow.svg",
+      "./_inc/images/background-mask-16-9-blue.svg",
+      "./_inc/images/background-mask-16-9-purple.svg",
+      "./_inc/images/background-mask-4-3-yellow.svg",
+      "./_inc/images/background-mask-4-3-blue.svg",
+      "./_inc/images/background-mask-4-3-purple.svg",
+      "./_inc/images/background-mask-16-10-yellow.svg",
+      "./_inc/images/background-mask-16-10-blue.svg",
+      "./_inc/images/background-mask-16-10-purple.svg"
+    ],
+    "fonts": []
+  }
+}

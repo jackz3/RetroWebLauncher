@@ -1,0 +1,16 @@
+---
+globs: *.ts,*.tsx
+---
+
+# TypeScript/React Coding Standards
+
+- Always use explicit types for exported APIs and function signatures.
+- Prefer meaningful, descriptive names (avoid 1–2 character identifiers).
+- Use guard clauses and handle edge cases early; avoid deep nesting.
+- Do not catch errors without meaningful handling.
+- Match existing formatting; avoid unrelated reformatting in edits.
+- Keep comments focused on "why" rather than "how".
+- Avoid `any`; prefer precise types. Never use unsafe casts.
+- Ensure no linter errors; run checks after edits.
+- In React components, keep props typed and avoid inline anonymous functions in hot paths.
+- Use multi-line for complex logic; keep lines readable.

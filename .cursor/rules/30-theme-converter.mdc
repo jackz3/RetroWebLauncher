@@ -1,0 +1,23 @@
+---
+description: Theme conversion pipeline and references
+---
+
+# Theme Conversion Pipeline
+
+- Source themes live under [`es-de_themes`](mdc:es-de_themes).
+- Conversion scripts:
+  - [`scripts/convert-themes.ts`](mdc:scripts/convert-themes.ts)
+  - [`scripts/convert-metadata.ts`](mdc:scripts/convert-metadata.ts)
+- Core utilities:
+  - [`src/theme-converter.ts`](mdc:src/theme-converter.ts)
+  - [`src/themeUtils.ts`](mdc:src/themeUtils.ts)
+- Output targets:
+  - Converted theme JSON and assets under [`public/themes`](mdc:public/themes).
+  - Shared help icons under [`public/images/help`](mdc:public/images/help).
+
+See docs:
+- [`doc/theme_converter_guide.md`](mdc:doc/theme_converter_guide.md)
+- [`doc/theme_converter_variable_fix.md`](mdc:doc/theme_converter_variable_fix.md)
+- [`doc/theme_converter_fixes.md`](mdc:doc/theme_converter_fixes.md)
+- [`doc/THEME_VARIANT_IMPLEMENTATION.md`](mdc:doc/THEME_VARIANT_IMPLEMENTATION.md)
+- [`doc/theme_guide.md`](mdc:doc/theme_guide.md)

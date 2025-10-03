@@ -1,0 +1,15 @@
+---
+description: Assets and themes directory layout
+---
+
+# Assets and Themes Layout
+
+- App-served themes: [`public/themes`](mdc:public/themes)
+  - Example theme JSONs: [`public/themes/analogue-os-menu-es-de.json`](mdc:public/themes/analogue-os-menu-es-de.json), [`public/themes/atari-50-menu-es-de.json`](mdc:public/themes/atari-50-menu-es-de.json), [`public/themes/mania-menu-es-de.json`](mdc:public/themes/mania-menu-es-de.json)
+  - Per-theme assets (fonts/images) under `public/themes/<theme>/_inc/...`
+- Source themes and assets: [`es-de_themes`](mdc:es-de_themes)
+- Emulator cores and WASM: [`public/cores`](mdc:public/cores)
+- Frontend bundle assets: [`public/assets/frontend`](mdc:public/assets/frontend)
+
+Notes:
+- Keep file paths consistent between source and output to simplify lookups.
