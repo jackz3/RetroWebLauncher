@@ -2,9 +2,9 @@
   "name": "atari-50-menu-es-de",
   "variables": {
     "spacerImage": "./_inc/images/space.png",
-    "fontThin": "./_inc/fonts/HarryPlain.otf",
-    "fontRegular": "./_inc/fonts/HarryHeavy.otf",
-    "fontBold": "./_inc/fonts/HarryFat.otf"
+    "fontThin": "./_inc/fonts/HarryPlain.woff2",
+    "fontRegular": "./_inc/fonts/HarryHeavy.woff2",
+    "fontBold": "./_inc/fonts/HarryFat.woff2"
   },
   "capabilities": {
     "variants": [],
@@ -970,9 +970,9 @@
       "./_inc/images/layout-mask-4-3.svg"
     ],
     "fonts": [
-      "./_inc/fonts/HarryPlain.otf",
-      "./_inc/fonts/HarryFat.otf",
-      "./_inc/fonts/HarryHeavy.otf"
+      "./_inc/fonts/HarryPlain.woff2",
+      "./_inc/fonts/HarryHeavy.woff2",
+      "./_inc/fonts/HarryFat.woff2"
     ]
   }
 }

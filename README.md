@@ -1,8 +1,9 @@
 ## Retro Web Launcher
 
-- An easy-to-use retroarch web frontend
-- UI design is based on [ES-DE Themes](https://gitlab.com/es-de)
-- Emulator code is based on [RetroArch Web Player](https://web.libretro.com/) source
+A simple and easy-to-use web frontend for RetroArch.
+
+-   **Frontend**: UI and design based on [ES-DE Themes](https://gitlab.com/es-de).
+-   **Emulator Core**: Emulator code powered by the [RetroArch Web Player](https://web.libretro.com/).
 
 ### Features
 - ES-DE theme converter: parses theme XML (including include, variants, color schemes, aspect ratios), collects assets, and outputs a JSON per theme.

@@ -1,7 +1,7 @@
 {
   "name": "analogue-os-menu-es-de",
   "variables": {
-    "font": "./_inc/fonts/AnalogueOS-Regular.otf",
+    "font": "./_inc/fonts/GamePocket-Regular.woff2",
     "spacerImage": "./_inc/images/space.png",
     "colorSchemes": {
       "dark": {
@@ -1012,6 +1012,8 @@
       "./_inc/images/help-button-north.svg",
       "./_inc/images/help-button-west.svg"
     ],
-    "fonts": []
+    "fonts": [
+      "./_inc/fonts/GamePocket-Regular.woff2"
+    ]
   }
 }

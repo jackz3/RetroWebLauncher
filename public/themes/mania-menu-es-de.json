@@ -2,7 +2,7 @@
   "name": "mania-menu-es-de",
   "variables": {
     "spacerImage": "./_inc/images/space.png",
-    "font": "./_inc/fonts/sonic-mania-bitmap.ttf",
+    "font": "./_inc/fonts/sonic-mania-bitmap.woff2",
     "colorSchemes": {
       "yellow": {
         "backgroundColor": "yellow"
@@ -1239,6 +1239,8 @@
       "./_inc/images/background-mask-16-10-blue.svg",
       "./_inc/images/background-mask-16-10-purple.svg"
     ],
-    "fonts": []
+    "fonts": [
+      "./_inc/fonts/sonic-mania-bitmap.woff2"
+    ]
   }
 }
