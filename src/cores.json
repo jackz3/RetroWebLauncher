@@ -5,6 +5,12 @@
     "snes9x2005",
     "snes9x2010"
   ],
+  "sfc": [
+    "snes9x",
+    "snes9x2002",
+    "snes9x2005",
+    "snes9x2010"
+  ],
   "nes": [
     "fceumm",
     "nestopia",
@@ -35,6 +41,11 @@
     "gearsystem"
   ],
   "genesis": [
+    "genesis_plus_gx",
+    "genesis_plus_gx_wide",
+    "picodrive"
+  ],
+  "megadrive": [
     "genesis_plus_gx",
     "genesis_plus_gx_wide",
     "picodrive"

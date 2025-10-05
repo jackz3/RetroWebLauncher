@@ -4,7 +4,7 @@ import * as xml2js from 'xml2js';
 
 // List of systems to process (corrected filenames)
 const systems: string[] = [
-  'cps', 'cps1', 'cps2', 'cps3', 'famicom', 'fba', 
+  'cps', 'cps1', 'cps2', 'cps3', 'famicom', 'fba', 'sfc', 'megadrive',
   'gamegear', 'genesis', 'sega32x', 'psx', 'colecovision', 'pc88', 'c64',
   'snes', 'nes', 'gba', 'gb', 'gbc', 'genesis', 'neogeo', 'atarilynx', 'ngp', 'pcengine', 'virtualboy', 'wonderswan', 'mame', 'arcade', 'dos',
   'arduboy', 'chailove', 'gameandwatch', 'lowresnx', 'lutro', 'macintosh', 'palm', '3do', 'doom', 'pico8', 'scummvm', 'j2me', 'tic80', 'quake', 'uzebox', 'vectrex', 'wasm4', 'x1'
