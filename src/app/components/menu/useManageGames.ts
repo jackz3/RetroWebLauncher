@@ -13,7 +13,7 @@ export function useManageGames() {
       setFiles([]);
       return;
     }
-    const list = await browserFS.readDir(`/${selectedSystem}`);
+    const list = await browserFS.readDir(`/roms/${selectedSystem}`);
     setFiles(list);
   }, [selectedSystem]);
 
@@ -25,7 +25,7 @@ export function useManageGames() {
   const clearPending = useCallback(() => setPendingDelete(null), []);
 
   const requestDeleteByMeta = useCallback(async (meta: GamesFileMeta): Promise<'pending' | 'deleted' | 'noop'> => {
-    const full = `/${meta.systemId}/${meta.fileName}`;
+    const full = `/roms/${meta.systemId}/${meta.fileName}`;
     if (pendingDelete === full) {
       await browserFS.deleteFile(full);
       setPendingDelete(null);

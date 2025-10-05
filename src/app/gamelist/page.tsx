@@ -53,7 +53,7 @@ export default function GameListPage() {
         } else {
           // Default to virtual FS
           await browserFS.init();
-          const files = await browserFS.readDir(`/${selectedSystem}`);
+          const files = await browserFS.readDir(`/roms/${selectedSystem}`);
           if (mounted) setGameFiles(files);
         }
       } catch (err) {

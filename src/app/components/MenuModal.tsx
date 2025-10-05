@@ -879,14 +879,14 @@ const MenuModal = () => {
                 onUploadFiles={(files, done) => {
                   if (!localSelectedSystem) return;
                   (async () => {
-                    await browserFS.ensureDir(`/${localSelectedSystem}`);
+                    await browserFS.ensureDir(`/roms/${localSelectedSystem}`);
                     let total = files.length;
                     for (let i = 0; i < files.length; i++) {
                       const file = files[i];
                       const reader = new FileReader();
                       reader.readAsArrayBuffer(file);
                       reader.onload = async () => {
-                        await browserFS.saveGameFile(`/${localSelectedSystem}/${file.name}`, reader.result as ArrayBuffer);
+                        await browserFS.saveGameFile(`/roms/${localSelectedSystem}/${file.name}`, reader.result as ArrayBuffer);
                         total--;
                         if (total === 0) {
                           refreshGameFiles();

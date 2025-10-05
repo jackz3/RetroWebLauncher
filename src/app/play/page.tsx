@@ -19,7 +19,7 @@ declare global {
 
 // Async init using BrowserFS.configure, with clean async/await flow
 async function initRetroFs(platform: string, game: string): Promise<void> {
-    const src = `/${platform}/${game}`;
+    const src = `/roms/${platform}/${game}`;
     const dst = `/home/web_user/retroarch/userdata/content/downloads/${game}`;
 
     // Decide data source

@@ -52,7 +52,7 @@ class BrowserFSService {
   // 初始化（只执行一次）
   async init() {
     if (this.initialized) return this;
-    const idbfs = await createIndexedDBFS({ storeName: 'PlayRetro' });
+    const idbfs = await createIndexedDBFS({ storeName: 'RWL' });
     initialize(idbfs);
     this.initialized = true;
     return this;
@@ -70,7 +70,7 @@ class BrowserFSService {
     const zipData = arrayBuffer2Buffer(zipArrayBuf);
     const zipFS = await createZipFS({ zipData });
 
-    const idbfs = await createIndexedDBFS({ storeName: 'PlayRetro' });
+    const idbfs = await createIndexedDBFS({ storeName: 'RWL' });
 
     const inMemoryFSGame = await createInMemoryFS({});
     const inMemoryFSUserData = await createInMemoryFS({});
