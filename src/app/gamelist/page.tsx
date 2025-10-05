@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../ThemeProvider';
 import { getViewElements } from '../../themeUtils';
@@ -9,6 +9,7 @@ import { useThemeStore } from '../store/theme';
 import { useKeyboardStore } from '../store/keyboard';
 import { browserFS } from '../utils/fs';
 import { oneDrive } from '../utils/onedrive';
+import LoadingOverlay from '@/app/components/common/LoadingOverlay';
 
 export default function GameListPage() {
   const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio } = useTheme();
@@ -20,6 +21,17 @@ export default function GameListPage() {
 
   const [gameFiles, setGameFiles] = useState<string[]>([]);
   const [screenshotFiles, setScreenshotFiles] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>('Loading games...');
+  const loadingLogsRef = useRef<string[]>([]);
+  const [, forceRerender] = useState(0);
+
+  const pushLog = (msg: string) => {
+    loadingLogsRef.current.push(msg);
+    forceRerender((n) => (n + 1) % 1000);
+    // eslint-disable-next-line no-console
+    console.log('[GAMELIST]', msg);
+  };
 
   useEffect(() => {
     setView('gamelist');
@@ -31,9 +43,15 @@ export default function GameListPage() {
       if (!selectedSystem) {
         if (mounted) setGameFiles([]);
         if (mounted) setScreenshotFiles([]);
+        if (mounted) setLoading(false);
         return;
       }
       // Determine data source from localStorage
+      if (mounted) {
+        setLoading(true);
+        setLoadingMessage('Loading games...');
+        pushLog(`Fetching games for system: ${selectedSystem}`);
+      }
       const source = typeof window !== 'undefined' ? localStorage.getItem('source') : 'vfs';
       try {
         if (source === 'onedrive') {
@@ -43,13 +61,19 @@ export default function GameListPage() {
           const screenshotsPath = `${root}/media/screenshots/${selectedSystem}`;
 
           // Ensure OneDrive is initialized and attempt to load items
+          if (mounted) setLoadingMessage('Connecting to OneDrive...');
+          pushLog('Initializing OneDrive SDK...');
           await oneDrive.init();
           if (!oneDrive.isSignedIn()) {
             console.warn('OneDrive selected but user is not signed in.');
+            pushLog('OneDrive selected but user is not signed in.');
             if (mounted) setGameFiles([]);
             if (mounted) setScreenshotFiles([]);
+            if (mounted) setLoading(false);
             return;
           }
+          if (mounted) setLoadingMessage('Listing games from OneDrive...');
+          pushLog(`Listing directory: ${path}`);
           const entries = await oneDrive.listChildren(path);
           // Filter files only and map to names
           const files = entries.filter((e) => !e.isDir).map((e) => e.name);
@@ -57,6 +81,8 @@ export default function GameListPage() {
 
           // Load screenshots (PNG files) for this system
           try {
+            if (mounted) setLoadingMessage('Loading screenshots...');
+            pushLog(`Listing screenshots: ${screenshotsPath}`);
             const screenshotEntries = await oneDrive.listChildren(screenshotsPath);
             const pngs = screenshotEntries
               .filter((e) => !e.isDir && /\.png$/i.test(e.name))
@@ -64,28 +90,39 @@ export default function GameListPage() {
             if (mounted) setScreenshotFiles(pngs);
           } catch (sErr) {
             console.warn('No screenshots found on OneDrive or failed to list:', sErr);
+            pushLog(`No screenshots found or failed to list: ${String((sErr as any)?.message || sErr)}`);
             if (mounted) setScreenshotFiles([]);
           }
         } else {
           // Default to virtual FS
+          if (mounted) setLoadingMessage('Initializing virtual filesystem...');
+          pushLog('Initializing BrowserFS...');
           await browserFS.init();
+          if (mounted) setLoadingMessage('Reading game directory...');
+          pushLog(`Reading directory: /roms/${selectedSystem}`);
           const files = await browserFS.readDir(`/roms/${selectedSystem}`);
           if (mounted) setGameFiles(files);
 
           // Try to read screenshots directory from VFS
           try {
+            if (mounted) setLoadingMessage('Reading screenshots...');
+            pushLog(`Reading directory: /media/screenshots/${selectedSystem}`);
             const pngs = (await browserFS.readDir(`/media/screenshots/${selectedSystem}`))
               .filter((name: string) => /\.png$/i.test(name));
             if (mounted) setScreenshotFiles(pngs);
           } catch (sErr) {
             console.warn('No screenshots found in VFS or failed to read:', sErr);
+            pushLog(`No screenshots found or failed to read: ${String((sErr as any)?.message || sErr)}`);
             if (mounted) setScreenshotFiles([]);
           }
         }
       } catch (err) {
         console.error('Failed to fetch game list:', err);
+        pushLog(`Failed to fetch game list: ${String((err as any)?.message || err)}`);
         if (mounted) setGameFiles([]);
         if (mounted) setScreenshotFiles([]);
+      } finally {
+        if (mounted) setLoading(false);
       }
     }
     fetchGames();
@@ -141,6 +178,12 @@ export default function GameListPage() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
+      <LoadingOverlay
+        show={loading}
+        title="Loading games"
+        message={loadingMessage}
+        logs={loadingLogsRef.current}
+      />
       {/* 渲染主题元素 */}
       {gamelistElements.map((element: any) => {
         const isList = element.type === 'textlist' || element.type === 'carousel' || element.type === 'grid';

@@ -11,7 +11,7 @@ import { oneDrive } from '../utils/onedrive';
 import { FileBrowser, type FileBrowserHandle } from './menu/FileBrowser';
 import { SystemList } from './menu/SystemList';
 import { ManageGames } from './menu/ManageGames';
-import { useManageGames } from './menu/useManageGames';
+import { useManageGames } from '../hooks/useManageGames';
 import type { FsAdapter, FsEntry } from './menu/fsTypes';
 
 // Extracted types and builders
@@ -23,8 +23,8 @@ import {
   formatThemeName,
   type MenuItem
 } from './menu/menuBuilder';
-import type { SystemItem } from './menu/useMenuState';
-import { useMenuState } from './menu/useMenuState';
+import type { SystemItem } from '../hooks/useMenuState';
+import { useMenuState } from '../hooks/useMenuState';
 import cores from '../../cores.json';
 
 const MenuModal = () => {

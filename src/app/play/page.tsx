@@ -1,12 +1,13 @@
 'use client'
 import { useThemeStore } from '@/app/store/theme';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EmscriptenFS } from 'browserfs'
 import { focusManager } from '../focusManager';
 import { ElementNavigation } from '../store/keyboard';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { browserFS } from '../utils/fs';
 import { oneDrive } from '../utils/onedrive';
+import LoadingOverlay from '@/app/components/common/LoadingOverlay';
 
 declare global {
     interface Window {
@@ -55,6 +56,21 @@ export default function PlayPage() {
     // const { systemId, gameFile, setSystemAndGame } = useModalStore();
     const router = useRouter();
 
+    // Loading overlay state
+    const [loading, setLoading] = useState(false);
+    const [loadingMessage, setLoadingMessage] = useState<string>('Initializing...');
+    const loadingLogsRef = useRef<string[]>([]);
+    const [, forceRerender] = useState(0); // to refresh logs visual occasionally
+
+    const pushLog = (msg: string) => {
+        loadingLogsRef.current.push(msg);
+        // Avoid too many renders; throttle by forcing a tiny rerender
+        forceRerender(n => (n + 1) % 1000);
+        // Keep console in sync for dev
+        // eslint-disable-next-line no-console
+        console.log('[PLAY]', msg);
+    };
+
     function initModule() {
         window.Module = {
             noInitialRun: true,
@@ -73,14 +89,18 @@ export default function PlayPage() {
             },
             print: function (text: string) {
                 console.log(text);
+                pushLog(text);
             },
             printErr: async function (text: string) {
                 console.log(text);
+                pushLog(text);
                 if (text === '[INFO] [Core]: Unloading core symbols..') {
                     console.log('Game exited');
+                    pushLog('Game exited');
                     await browserFS.reset();
                     router.push('/gamelist?system=' + (system || ''));
                     window.onbeforeunload = null;
+                    setLoading(false);
                 }
             },
             canvas: document.getElementById('canvas'),
@@ -113,11 +133,24 @@ export default function PlayPage() {
             focusManager.registerElement(playElement);
             const core = systems[system];// 'snes9x';
             console.log('Starting game', system, gameFile, core);
+            setLoading(true);
+            setLoadingMessage('Preparing emulator...');
+            pushLog(`Starting game: system=${system} file=${gameFile} core=${core}`);
             initModule()
             window.Module.arguments = navigator.userAgent.indexOf('Chrome') > 0 ? ['-v', `/home/web_user/retroarch/userdata/content/downloads/${gameFile}`] : ["-v", "--menu"]
             window.Module.onRuntimeInitialized = async () => {
                 // Initialize BrowserFS mounts and copy the selected game
-                await initRetroFs(system, gameFile);
+                try {
+                    setLoadingMessage('Setting up filesystem...');
+                    pushLog('Initializing virtual filesystem...');
+                    await initRetroFs(system, gameFile);
+                    pushLog('Filesystem ready. Copy complete.');
+                } catch (e: any) {
+                    pushLog(`Filesystem initialization failed: ${e?.message || e}`);
+                    setLoadingMessage('Failed to set up filesystem');
+                    // keep overlay visible so user sees the error
+                    return;
+                }
                 window.onbeforeunload = function () {
                     return "Dude, are you sure you want to leave?";
                 }
@@ -125,20 +158,31 @@ export default function PlayPage() {
                 window.Module.canvas.addEventListener("pointerdown", function () {
                     window.Module.canvas.focus();
                 }, false);
+                setLoadingMessage('Starting core...');
+                pushLog('Launching core...');
                 window.Module['callMain'](window.Module['arguments']);
+                // hide overlay after a brief delay to ensure first frame paints
+                setTimeout(() => setLoading(false), 300);
             }
+            setLoadingMessage('Loading core script...');
             import(`../../../public/cores/${core}_libretro.js`)
                 .then((script: any) => {
+                    pushLog('Core script fetched. Initializing module...');
                     script.default(window.Module)
                         .then((mod: any) => {
                             console.log('Core loaded', mod);
+                            pushLog('Core loaded. Waiting for runtime initialization...');
                             window.Module = mod;
                         }).catch((err: any) => {
                             console.error("Couldn't instantiate module", err);
+                            pushLog(`Couldn't instantiate module: ${err?.message || err}`);
+                            setLoadingMessage('Failed to initialize core');
                             throw err;
                         })
                 }).catch(err => {
                     console.error("Couldn't load script", err);
+                    pushLog(`Couldn't load core script: ${err?.message || err}`);
+                    setLoadingMessage('Failed to load core');
                     throw err;
                 });
         }
@@ -147,6 +191,14 @@ export default function PlayPage() {
     }
     }, [view, system, gameFile]);
     return (
+      <div className='bg-black w-full h-full'>
+        <LoadingOverlay
+          show={loading}
+          title="Preparing to play"
+          message={loadingMessage}
+          logs={loadingLogsRef.current}
+        />
         <canvas id="canvas" tabIndex={1} style={{ width: '100vw', height: '100vh', zIndex: 99999, display: view === 'play' ? 'block' : 'none' }} onContextMenu={(event) => event.preventDefault()}></canvas>
+      </div>
     );
 }

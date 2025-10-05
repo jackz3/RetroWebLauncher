@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { browserFS } from '../../utils/fs';
+import { browserFS } from '../utils/fs';
 
 export type GamesFileMeta = { systemId: string; fileName: string };
 

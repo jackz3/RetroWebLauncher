@@ -80,10 +80,8 @@ export default function GridElement({
   const [scrollOffset, setScrollOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // 防御性处理：items 为空时不渲染内容
-  if (!Array.isArray(items) || items.length === 0) {
-    return null;
-  }
+  // 注意：不要在 Hooks 声明之后根据 items 条件性地提前 return，
+  // 否则在后续渲染中会改变 Hook 的调用顺序，触发 React 的 Hooks 顺序错误。
 
   // 解析位置和尺寸
   const [posX, posY] = (props.pos || '0 0.1').split(' ').map(Number);

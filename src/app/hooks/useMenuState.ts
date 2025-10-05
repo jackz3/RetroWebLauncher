@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import type { MenuItem } from './menuBuilder';
+import type { MenuItem } from '../components/menu/menuBuilder';
 
 export interface SystemItem {
   id: string;
