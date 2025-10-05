@@ -5,12 +5,13 @@ import { getElementDefaultProps } from '../../../themeUtils';
 import { useFontLoader } from '../../hooks/useFontLoader';
 import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 import { useModalStore } from '@/app/store/modal';
+import FsImage from '@/app/components/common/FsImage';
 
 interface GridElementProps {
   element: any;
   themeVariables?: any;
   themeName?: string;
-  items?: Array<{ name: string; image?: string; [key: string]: any }>;
+  items?: Array<{ name: string; image?: string; system?: string; screenshot?: boolean; [key: string]: any }>;
   selectedIndex?: number;
   onItemSelect?: (index: number) => void;
   onBack?: () => void;
@@ -133,6 +134,9 @@ export default function GridElement({
   const textSelectedBackgroundColor = parseColorSafely(props.textSelectedBackgroundColor || props.textBackgroundColor || 'FFFFFF00');
   
   const fontSize = parseFloat(props.fontSize || '0.045') * 100; // vh
+  const imageType = (props.imageType || '').toString().toLowerCase(); // screenshot | fanart | miximage | cover
+
+  // Using shared FsImage component for BrowserFS-loaded images
 
   // 计算网格布局参数
   const containerWidth = sizeW * 100; // vw
@@ -228,20 +232,23 @@ export default function GridElement({
                 onItemSelect?.(actualIndex);
               }}
             >
-              {item.image && (
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  style={{
-                    width: '100%',
-                    height: '70%',
-                    objectFit: imageFit,
-                    borderRadius: `${imageCornerRadius * 100}%`,
-                    backgroundColor: isSelected ? imageSelectedColor : imageColor,
-                    opacity: isSelected ? 1 : unfocusedItemOpacity,
-                  }}
-                />
-              )}
+              {(() => {
+                const imgStyle: React.CSSProperties = {
+                  width: '100%',
+                  height: '70%',
+                  objectFit: imageFit,
+                  borderRadius: `${imageCornerRadius * 100}%`,
+                  backgroundColor: isSelected ? imageSelectedColor : imageColor,
+                  opacity: isSelected ? 1 : unfocusedItemOpacity,
+                };
+                if (imageType === 'screenshot' && item?.screenshot && item?.system && item?.name) {
+                  return <FsImage system={item.system} name={item.name} alt={item.name} style={imgStyle} />;
+                }
+                if (item.image) {
+                  return <img src={item.image} alt={item.name} style={imgStyle} />;
+                }
+                return null;
+              })()}
               <div 
                 className='w-full h-full flex items-center justify-center'
                 style={{

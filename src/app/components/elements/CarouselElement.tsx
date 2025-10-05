@@ -5,12 +5,13 @@ import { getElementDefaultProps } from '../../../themeUtils';
 import { useFontLoader } from '../../hooks/useFontLoader';
 import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 import { useModalStore } from '@/app/store/modal';
+import FsImage from '@/app/components/common/FsImage';
 
 interface CarouselElementProps {
   element: any;
   themeVariables?: any;
   themeName?: string;
-  items?: Array<{ name: string; image?: string; [key: string]: any }>;
+  items?: Array<{ name: string; image?: string; system?: string; screenshot?: boolean; [key: string]: any }>;
   selectedIndex?: number;
   onItemSelect?: (index: number) => void;
   onBack?: () => void;
@@ -123,6 +124,9 @@ export default function CarouselElement({
   const textSelectedBackgroundColor = parseColorSafely(props.textSelectedBackgroundColor || props.textBackgroundColor || 'FFFFFF00');
   
   const fontSize = parseFloat(props.fontSize || '0.085') * 100; // vh
+  const imageType = (props.imageType || '').toString().toLowerCase(); // screenshot | fanart | miximage | cover
+
+  // Using shared FsImage component for BrowserFS-loaded images
 
   // 只渲染 maxItemCount 个条目，居中排列
   const maxItemCount = parseInt(props.maxItemCount || '3', 10);
@@ -164,6 +168,17 @@ export default function CarouselElement({
             offset += isVertical ? selectedOffsetY * 100 : selectedOffsetX * 100;
           }
           
+          // Resolve image style and source based on imageType and item flags
+          const imageStyle: React.CSSProperties = {
+            width: '100%',
+            height: '70%',
+            objectFit: imageFit,
+            borderRadius: `${imageCornerRadius * 100}%`,
+            backgroundColor: isSelected ? imageSelectedColor : imageColor,
+            opacity: isSelected ? 1 : unfocusedItemOpacity,
+          };
+          const resolvedImageSrc: string | undefined = imageType === 'screenshot' ? undefined : item.image;
+
           return (
             <div
               key={`${item._carouselIndex}_${item._offset}`}
@@ -189,20 +204,11 @@ export default function CarouselElement({
                 onItemSelect?.(item._carouselIndex);
               }}
             >
-              {item.image && (
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  style={{
-                    width: '100%',
-                    height: '70%',
-                    objectFit: imageFit,
-                    borderRadius: `${imageCornerRadius * 100}%`,
-                    backgroundColor: isSelected ? imageSelectedColor : imageColor,
-                    opacity: isSelected ? 1 : unfocusedItemOpacity,
-                  }}
-                />
-              )}
+              {imageType === 'screenshot' && item?.screenshot && item?.system && item?.name ? (
+                <FsImage system={item.system} name={item.name} alt={item.name} style={imageStyle} />
+              ) : resolvedImageSrc ? (
+                <img src={resolvedImageSrc} alt={item.name} style={imageStyle} />
+              ) : null}
               <div className='w-full h-full flex items-center justify-center'
                 style={{
                   color: isSelected ? textSelectedColor : textColor,

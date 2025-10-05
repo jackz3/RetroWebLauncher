@@ -19,6 +19,7 @@ export default function GameListPage() {
   const router = useRouter();
 
   const [gameFiles, setGameFiles] = useState<string[]>([]);
+  const [screenshotFiles, setScreenshotFiles] = useState<string[]>([]);
 
   useEffect(() => {
     setView('gamelist');
@@ -29,6 +30,7 @@ export default function GameListPage() {
     async function fetchGames() {
       if (!selectedSystem) {
         if (mounted) setGameFiles([]);
+        if (mounted) setScreenshotFiles([]);
         return;
       }
       // Determine data source from localStorage
@@ -38,27 +40,52 @@ export default function GameListPage() {
           // Build path: onedrive-rootdir + '/roms/' + systemid
           const root = localStorage.getItem('onedrive-rootdir') || '';
           const path = `${root}/roms/${selectedSystem}`;
+          const screenshotsPath = `${root}/media/screenshots/${selectedSystem}`;
 
           // Ensure OneDrive is initialized and attempt to load items
           await oneDrive.init();
           if (!oneDrive.isSignedIn()) {
             console.warn('OneDrive selected but user is not signed in.');
             if (mounted) setGameFiles([]);
+            if (mounted) setScreenshotFiles([]);
             return;
           }
           const entries = await oneDrive.listChildren(path);
           // Filter files only and map to names
           const files = entries.filter((e) => !e.isDir).map((e) => e.name);
           if (mounted) setGameFiles(files);
+
+          // Load screenshots (PNG files) for this system
+          try {
+            const screenshotEntries = await oneDrive.listChildren(screenshotsPath);
+            const pngs = screenshotEntries
+              .filter((e) => !e.isDir && /\.png$/i.test(e.name))
+              .map((e) => e.name);
+            if (mounted) setScreenshotFiles(pngs);
+          } catch (sErr) {
+            console.warn('No screenshots found on OneDrive or failed to list:', sErr);
+            if (mounted) setScreenshotFiles([]);
+          }
         } else {
           // Default to virtual FS
           await browserFS.init();
           const files = await browserFS.readDir(`/roms/${selectedSystem}`);
           if (mounted) setGameFiles(files);
+
+          // Try to read screenshots directory from VFS
+          try {
+            const pngs = (await browserFS.readDir(`/media/screenshots/${selectedSystem}`))
+              .filter((name: string) => /\.png$/i.test(name));
+            if (mounted) setScreenshotFiles(pngs);
+          } catch (sErr) {
+            console.warn('No screenshots found in VFS or failed to read:', sErr);
+            if (mounted) setScreenshotFiles([]);
+          }
         }
       } catch (err) {
         console.error('Failed to fetch game list:', err);
         if (mounted) setGameFiles([]);
+        if (mounted) setScreenshotFiles([]);
       }
     }
     fetchGames();
@@ -66,10 +93,28 @@ export default function GameListPage() {
   }, [selectedSystem, gameListRefreshKey]);
 
   // Map file names to objects for ElementRenderer compatibility
-  const gameList = gameFiles.map(file => ({
-    name: file,
-    system: selectedSystem || ''
-  }));
+  // Ensure name shows only the base filename without extension
+  // Precompute screenshot base names (without extension) for quick lookup
+  const screenshotBaseSet = new Set(
+    screenshotFiles.map((f) => {
+      const b = f.split('/').pop() || f;
+      const d = b.lastIndexOf('.');
+      return d > 0 ? b.slice(0, d) : b;
+    })
+  );
+
+  const gameList = gameFiles.map((file) => {
+    const base = file.split('/').pop() || file;
+    const dot = base.lastIndexOf('.');
+    const name = dot > 0 ? base.slice(0, dot) : base;
+    const hasScreenshot = screenshotBaseSet.has(name);
+    return {
+      name,
+      file,
+      system: selectedSystem || '',
+      screenshot: hasScreenshot,
+    };
+  });
 
   const handleBack = () => {
     router.push('/system');
@@ -80,7 +125,7 @@ export default function GameListPage() {
     console.log('Selected Game:', selectedGame);
     // setSystemAndGame(selectedGame.system, selectedGame.name);
 
-    router.push(`/play?s=${selectedGame.system}&g=${selectedGame.name}`);
+    router.push(`/play?s=${selectedGame.system}&g=${selectedGame.file}`);
   };
 
   if (!themeJson || !selectedVariant || !selectedAspectRatio) {
