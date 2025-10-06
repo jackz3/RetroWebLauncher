@@ -22,7 +22,7 @@ export function LoadingOverlay({ show, title = 'Loading', message, logs = [] }: 
         {logs.length > 0 && (
           <div className="max-h-40 overflow-auto rounded-md bg-black/30 p-2 text-xs font-mono text-zinc-300">
             {logs.slice(-10).map((l, i) => (
-              // eslint-disable-next-line react/no-array-index-key
+               
               <div key={i} className="whitespace-pre-wrap leading-relaxed">
                 {l}
               </div>

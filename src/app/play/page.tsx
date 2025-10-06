@@ -14,7 +14,6 @@ declare global {
         Module: any,
         FS: any,
         Buffer: any,
-        exitGame: Function,
     }
 }
 
@@ -67,7 +66,7 @@ export default function PlayPage() {
         // Avoid too many renders; throttle by forcing a tiny rerender
         forceRerender(n => (n + 1) % 1000);
         // Keep console in sync for dev
-        // eslint-disable-next-line no-console
+         
         console.log('[PLAY]', msg);
     };
 

@@ -200,8 +200,8 @@ export const useKeyboardNavigation = ({
       // 对于TextList等非Grid元素，上下导航总是可用（支持循环）
       let canNavigateUp = true;
       let canNavigateDown = true;
-      let canNavigateLeft = true;
-      let canNavigateRight = true;
+      const canNavigateLeft = true;
+      const canNavigateRight = true;
       
       // Grid元素的导航状态更新
       if (elementType === 'grid') {

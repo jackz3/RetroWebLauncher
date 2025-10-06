@@ -7,6 +7,7 @@ import TextElement from './elements/TextElement';
 // import SystemStatusElement from './elements/SystemStatusElement';
 import HelpSystemElement from './elements/HelpSystemElement';
 
+const CarouselElement = dynamic(() => import('./elements/CarouselElement'), { ssr: false });
 const GridElement = dynamic(() => import('./elements/GridElement'), { ssr: false });
 
 interface ElementRendererProps {
@@ -73,8 +74,6 @@ export default function ElementRenderer({
     case 'text':
       return <TextElement element={processedElement} themeVariables={themeVariables} themeName={themeName} item={item} />;
     case 'carousel':
-      // 懒加载，避免循环依赖
-      const CarouselElement = require('./elements/CarouselElement').default;
       return (
         <CarouselElement
           element={processedElement}

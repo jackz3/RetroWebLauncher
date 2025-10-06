@@ -76,7 +76,7 @@ export function getViewElements(
 
   // 互斥与唯一性处理：textlist、carousel、grid 只能三选一且只保留最后出现的一个
   const mutuallyExclusiveTypes = ['textlist', 'carousel', 'grid'];
-  let lastIdx: Record<string, number> = {};
+  const lastIdx: Record<string, number> = {};
   elements.forEach((el: any, idx: number) => {
     if (mutuallyExclusiveTypes.includes(el.type)) {
       lastIdx[el.type] = idx;

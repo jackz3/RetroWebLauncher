@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
@@ -779,7 +780,7 @@ class ThemeConverter {
       const views = this.parseViews(themeData);
 
       // Gather all views from top-level, aspectRatio, and variant
-      let allViews: ThemeView[] = [...views];
+      const allViews: ThemeView[] = [...views];
       aspectRatio.forEach(r => {
         if (r.views && Array.isArray(r.views)) {
           allViews.push(...r.views);

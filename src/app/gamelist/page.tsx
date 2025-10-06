@@ -29,7 +29,7 @@ export default function GameListPage() {
   const pushLog = (msg: string) => {
     loadingLogsRef.current.push(msg);
     forceRerender((n) => (n + 1) % 1000);
-    // eslint-disable-next-line no-console
+     
     console.log('[GAMELIST]', msg);
   };
 

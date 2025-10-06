@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "convert-themes": "npx tsx scripts/convert-themes.ts",
     "convert-metadata": "npx tsx scripts/convert-metadata.ts"
   },
