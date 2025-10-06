@@ -3,6 +3,6 @@
     "roms": {
         "nes": ["elite.zip"],
         "genesis": ["BERZERK.zip", "hardwired.zip", "seggala.zip", "ZEROTOL.zip"],
-        "snes": ["PACMAN.zip", "Super Boss Gaiden (J) V1.2b.zip"]
+        "snes": ["PACMAN.zip"]
     }
 }

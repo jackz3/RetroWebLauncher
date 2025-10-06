@@ -199,7 +199,7 @@ export default function PlayPage() {
           message={loadingMessage}
           logs={loadingLogsRef.current}
         />
-        <canvas id="canvas" tabIndex={1} style={{ width: '100vw', height: '100vh', zIndex: 99999, display: view === 'play' ? 'block' : 'none' }} onContextMenu={(event) => event.preventDefault()}></canvas>
+        <canvas id="canvas" tabIndex={1} style={{ width: '100vw', height: '100vh', border: 'none', outline: 'none', zIndex: 99999, display: view === 'play' ? 'block' : 'none' }} onContextMenu={(event) => event.preventDefault()}></canvas>
       </div>
     );
 }
