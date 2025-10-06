@@ -77,8 +77,10 @@ class BrowserFSService {
 
     const asyncMirrorFS = await createAsyncMirrorFS({ sync: inMemoryFSUserData, async: idbfs });
     const folderAdapter = await createFolderAdapterFS({ folder: "/userdata", wrapped: asyncMirrorFS});
+    const config = await createFolderAdapterFS({ folder: "/config", wrapped: asyncMirrorFS});
 
     const mountableFS = await createMountableFS({
+      '/home/web_user/.config/retroarch': config,
         '/home/web_user/retroarch/userdata': folderAdapter,
         '/home/web_user/retroarch/bundle': zipFS,
         '/home/web_user/retroarch/userdata/content/downloads': inMemoryFSGame,

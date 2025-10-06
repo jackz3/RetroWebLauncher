@@ -171,13 +171,13 @@ export default function CarouselElement({
           // Resolve image style and source based on imageType and item flags
           const imageStyle: React.CSSProperties = {
             width: '100%',
-            height: '70%',
+            height: '100%',
             objectFit: imageFit,
             borderRadius: `${imageCornerRadius * 100}%`,
             backgroundColor: isSelected ? imageSelectedColor : imageColor,
             opacity: isSelected ? 1 : unfocusedItemOpacity,
           };
-          const resolvedImageSrc: string | undefined = imageType === 'screenshot' ? undefined : item.image;
+          // const resolvedImageSrc: string | undefined = imageType === 'screenshot' ? undefined : item.image;
 
           return (
             <div
@@ -194,7 +194,7 @@ export default function CarouselElement({
                 cursor: isSelected ? 'pointer' : 'default',
                 borderRadius: `${imageCornerRadius * 100}%`,
                 background: isSelected ? parseColorSafely(props.color || 'FFFFFFD8') : 'transparent',
-                boxShadow: isSelected ? '0 0 8px #aaa' : 'none',
+                // boxShadow: isSelected ? '0 0 8px #aaa' : 'none',
                 transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
                 opacity: isSelected ? 1 : unfocusedItemOpacity,
                 filter: isSelected ? 'none' : `saturate(${unfocusedItemSaturation}) brightness(${unfocusedItemDimming})`,
@@ -206,9 +206,7 @@ export default function CarouselElement({
             >
               {imageType === 'screenshot' && item?.screenshot && item?.system && item?.name ? (
                 <FsImage system={item.system} name={item.name} alt={item.name} style={imageStyle} />
-              ) : resolvedImageSrc ? (
-                <img src={resolvedImageSrc} alt={item.name} style={imageStyle} />
-              ) : null}
+              ) : 
               <div className='w-full h-full flex items-center justify-center'
                 style={{
                   color: isSelected ? textSelectedColor : textColor,
@@ -216,7 +214,7 @@ export default function CarouselElement({
                   fontWeight: isSelected ? 'bold' : 'normal',
                   fontSize: `${fontSize}vh`,
                   textAlign: 'center',
-                  textShadow: isSelected ? '0 2px 8px rgba(255, 255, 255, 0.5)' : 'none',
+                  // textShadow: isSelected ? '0 2px 8px rgba(255, 255, 255, 0.5)' : 'none',
                   // whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -225,7 +223,7 @@ export default function CarouselElement({
                 }}
               >
                 {item.name}
-              </div>
+              </div>}
             </div>
           );
         })}

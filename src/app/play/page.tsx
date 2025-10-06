@@ -154,6 +154,7 @@ export default function PlayPage() {
                 window.onbeforeunload = function () {
                     return "Dude, are you sure you want to leave?";
                 }
+                // window.Module.requestFullscreen(false);
                 window.Module.canvas.focus();
                 window.Module.canvas.addEventListener("pointerdown", function () {
                     window.Module.canvas.focus();
@@ -191,7 +192,7 @@ export default function PlayPage() {
     }
     }, [view, system, gameFile]);
     return (
-      <div className='bg-black w-full h-full'>
+      <div className='bg-black'>
         <LoadingOverlay
           show={loading}
           title="Preparing to play"

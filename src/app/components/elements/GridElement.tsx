@@ -231,19 +231,16 @@ export default function GridElement({
               }}
             >
               {(() => {
+                if (imageType === 'screenshot' && item?.screenshot && item?.system && item?.name) {
                 const imgStyle: React.CSSProperties = {
                   width: '100%',
-                  height: '70%',
+                  height: '100%',
                   objectFit: imageFit,
                   borderRadius: `${imageCornerRadius * 100}%`,
                   backgroundColor: isSelected ? imageSelectedColor : imageColor,
                   opacity: isSelected ? 1 : unfocusedItemOpacity,
                 };
-                if (imageType === 'screenshot' && item?.screenshot && item?.system && item?.name) {
                   return <FsImage system={item.system} name={item.name} alt={item.name} style={imgStyle} />;
-                }
-                if (item.image) {
-                  return <img src={item.image} alt={item.name} style={imgStyle} />;
                 }
                 return null;
               })()}
