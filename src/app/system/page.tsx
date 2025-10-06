@@ -40,7 +40,7 @@ export default function SystemPage() {
   const { openThemeSelector } = useModalStore();
   
   const handleBack = () => {
-    openThemeSelector();
+    // openThemeSelector();
   };
 
   if (!themeJson || !selectedVariant || !selectedAspectRatio) { // Add selectedVariant to loading check

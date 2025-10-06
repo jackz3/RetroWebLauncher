@@ -64,6 +64,7 @@ export default function Page() {
         '/roms',
         '/media',
         ...targetSystems.map((s) => `/roms/${s}`),
+        ...((demo.media || []).map((m) => `/media/${m}`)),
         ...((demo.media || []).flatMap((m) => targetSystems.map((s) => `/media/${m}/${s}`))),
       ]);
 

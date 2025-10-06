@@ -136,7 +136,8 @@ export default function PlayPage() {
             setLoadingMessage('Preparing emulator...');
             pushLog(`Starting game: system=${system} file=${gameFile} core=${core}`);
             initModule()
-            window.Module.arguments = navigator.userAgent.indexOf('Chrome') > 0 ? ['-v', `/home/web_user/retroarch/userdata/content/downloads/${gameFile}`] : ["-v", "--menu"]
+            // window.Module.arguments = navigator.userAgent.indexOf('Chrome') > 0 ? ['-v', `/home/web_user/retroarch/userdata/content/downloads/${gameFile}`] : ["-v", "--menu"]
+            window.Module.arguments = ['-v', `/home/web_user/retroarch/userdata/content/downloads/${gameFile}`];
             window.Module.onRuntimeInitialized = async () => {
                 // Initialize BrowserFS mounts and copy the selected game
                 try {
