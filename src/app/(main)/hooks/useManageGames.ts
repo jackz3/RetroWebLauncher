@@ -38,7 +38,9 @@ export function useManageGames() {
   }, [pendingDelete, refresh]);
 
   const isPending = useCallback((meta: GamesFileMeta) => {
-    const full = `/${meta.systemId}/${meta.fileName}`;
+    // Match the same absolute path format used when setting pendingDelete
+    // in requestDeleteByMeta (i.e., includes the /roms prefix)
+    const full = `/roms/${meta.systemId}/${meta.fileName}`;
     return pendingDelete === full;
   }, [pendingDelete]);
 

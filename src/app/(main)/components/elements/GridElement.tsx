@@ -59,19 +59,6 @@ export default function GridElement({
   const props = { ...defaults, ...element.properties };
 
   const { openThemeSelector } = useModalStore();
-  // 使用键盘导航钩子
-  const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
-    elementId: `grid-${element.name || 'default'}`,
-    elementType: 'grid',
-    totalItems: items.length,
-    initialIndex: externalSelectedIndex,
-    onSelect: onItemSelect,
-    onEscape: openThemeSelector,
-    onBack: onBack,
-    onNavigate: (direction, index) => {
-      console.log(`Grid navigated ${direction} to index ${index}`);
-    }
-  });
 
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
@@ -145,6 +132,21 @@ export default function GridElement({
   const itemsPerRow = Math.floor(containerWidth / effectiveItemWidth) || 1;
   const itemsPerColumn = Math.floor(containerHeight / effectiveItemHeight) || 1;
   const maxItems = itemsPerRow * itemsPerColumn;
+
+  // 使用键盘导航钩子（在计算出 itemsPerRow 之后传入 gridColumns）
+  const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
+    elementId: `grid-${element.name || 'default'}`,
+    elementType: 'grid',
+    totalItems: items.length,
+    initialIndex: externalSelectedIndex,
+    gridColumns: itemsPerRow,
+    onSelect: onItemSelect,
+    onEscape: openThemeSelector,
+    onBack: onBack,
+    onNavigate: (direction, index) => {
+      console.log(`Grid navigated ${direction} to index ${index}`);
+    }
+  });
 
   // 获取当前显示的项目（考虑滚动偏移）
   const displayItems = items.slice(scrollOffset, scrollOffset + maxItems);

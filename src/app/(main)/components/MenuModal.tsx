@@ -373,18 +373,18 @@ const MenuModal = () => {
         }
       }
       // 右键也触发删除请求（VFS 与 Manage Games 对齐）
-      if (menuState.title.startsWith('VFS:') && direction === 'right') {
-        await vfsBrowserRef.current?.requestDelete(index);
-      }
-      if (menuState.title === 'MANAGE GAMES' && direction === 'right') {
-        const item = menuState.current[index];
-        if (item?.meta && item.meta.kind === 'games-file') {
-          const result = await requestDeleteByMeta({ systemId: item.meta.systemId, fileName: item.meta.fileName });
-          if (result === 'deleted') {
-            try { useThemeStore.getState().incrementGameListRefreshKey(); } catch {}
-          }
-        }
-      }
+      // if (menuState.title.startsWith('VFS:') && direction === 'right') {
+      //   await vfsBrowserRef.current?.requestDelete(index);
+      // }
+      // if (menuState.title === 'MANAGE GAMES' && direction === 'right') {
+      //   const item = menuState.current[index];
+      //   if (item?.meta && item.meta.kind === 'games-file') {
+      //     const result = await requestDeleteByMeta({ systemId: item.meta.systemId, fileName: item.meta.fileName });
+      //     if (result === 'deleted') {
+      //       try { useThemeStore.getState().incrementGameListRefreshKey(); } catch {}
+      //     }
+      //   }
+      // }
       // 在 OneDrive 视图中，右键将选中的目录设置为 rootdir
       if (menuState.title.startsWith('ONEDRIVE:') && direction === 'right') {
         const offset = (odPath !== '/' ? 1 : 0);

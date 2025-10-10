@@ -9,6 +9,8 @@ interface UseKeyboardNavigationOptions {
   elementType: 'textlist' | 'carousel' | 'grid' | 'menu' | 'play';
   totalItems: number;
   initialIndex?: number;
+  // Number of columns in a grid; when provided, ArrowUp/Down will move by this step.
+  gridColumns?: number;
   resetDeps?: any[]; // when these deps change, reset selectedIndex to initialIndex
   resetToIndex?: number; // override initialIndex on reset
   onSelect?: (index: number) => void;
@@ -24,6 +26,7 @@ export const useKeyboardNavigation = ({
   elementType,
   totalItems,
   initialIndex = 0,
+  gridColumns,
   resetDeps,
   resetToIndex,
   onSelect,
@@ -91,12 +94,13 @@ export const useKeyboardNavigation = ({
     if (focusedElement?.id !== elementId) return false;
     
     let newIndex = selectedIndex;
+  const cols = Math.max(1, ((gridColumns ?? Math.floor(Math.sqrt(totalItems))) || 1));
     
     switch (action) {
       case 'navigateUp':
         if (elementType === 'grid') {
           // Grid元素的上导航：移动到上一行的同一列
-          const itemsPerRow = Math.floor(Math.sqrt(totalItems));
+          const itemsPerRow = cols;
           const currentRow = Math.floor(selectedIndex / itemsPerRow);
           const currentCol = selectedIndex % itemsPerRow;
           
@@ -121,7 +125,7 @@ export const useKeyboardNavigation = ({
       case 'navigateDown':
         if (elementType === 'grid') {
           // Grid元素的下导航：移动到下一行的同一列
-          const itemsPerRow = Math.floor(Math.sqrt(totalItems));
+          const itemsPerRow = cols;
           const currentRow = Math.floor(selectedIndex / itemsPerRow);
           const currentCol = selectedIndex % itemsPerRow;
           const totalRows = Math.ceil(totalItems / itemsPerRow);
@@ -147,18 +151,16 @@ export const useKeyboardNavigation = ({
       case 'navigateLeft':
         // 处理网格布局的左导航；非 grid 转发给 onNavigate 以支持自定义行为（如 VFS 删除确认）
         if (elementType === 'grid') {
-          const itemsPerRow = Math.floor(Math.sqrt(totalItems));
+          const itemsPerRow = cols;
           // 修改为跨行移动：在行首时移动到上一行末尾
           if (selectedIndex % itemsPerRow > 0) {
             newIndex = selectedIndex - 1;
           } else {
             // 在行首时移动到上一行末尾
             newIndex = selectedIndex - 1;
-            // 如果索引为负数，则保持在第一个项目
-            if (newIndex < 0) {
-              newIndex = 0;
-            }
           }
+          // Clamp 至合法范围
+          if (newIndex < 0) newIndex = 0;
           onNavigate?.('left', newIndex);
         } else {
           onNavigate?.('left', selectedIndex);
@@ -167,18 +169,16 @@ export const useKeyboardNavigation = ({
       case 'navigateRight':
         // 处理网格布局的右导航；非 grid 转发给 onNavigate 以支持自定义行为
         if (elementType === 'grid') {
-          const itemsPerRow = Math.floor(Math.sqrt(totalItems));
+          const itemsPerRow = cols;
           // 修改为跨行移动：在行尾时移动到下一行开头
           if (selectedIndex % itemsPerRow < itemsPerRow - 1) {
             newIndex = selectedIndex + 1;
           } else {
             // 在行尾时移动到下一行开头
             newIndex = selectedIndex + 1;
-            // 如果超出总项目数，则保持在最后一个项目
-            if (newIndex >= totalItems) {
-              newIndex = totalItems - 1;
-            }
           }
+          // Clamp 至合法范围，避免落到不存在的位置（例如最后一项后面）
+          if (newIndex >= totalItems) newIndex = totalItems - 1;
           onNavigate?.('right', newIndex);
         } else {
           onNavigate?.('right', selectedIndex);
@@ -205,7 +205,7 @@ export const useKeyboardNavigation = ({
       
       // Grid元素的导航状态更新
       if (elementType === 'grid') {
-        const itemsPerRow = Math.floor(Math.sqrt(totalItems));
+        const itemsPerRow = cols;
         const currentRow = Math.floor(newIndex / itemsPerRow);
         const totalRows = Math.ceil(totalItems / itemsPerRow);
         const currentCol = newIndex % itemsPerRow;
@@ -229,7 +229,7 @@ export const useKeyboardNavigation = ({
     }
     
     return true;
-  }, [focusedElement, elementId, selectedIndex, totalItems, elementType, onNavigate, onSelect, onBack, onEscape, updateNavigation]);
+  }, [focusedElement, elementId, selectedIndex, totalItems, gridColumns, elementType, onNavigate, onSelect, onBack, onEscape, updateNavigation]);
   
   // 注册键盘事件监听器
   useEffect(() => {
