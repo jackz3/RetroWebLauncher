@@ -41,3 +41,4 @@ yarn-error.log*
 next-env.d.ts
 /es-de_themes
 /es-de_repo
+/public/assets/frontend/bundle/

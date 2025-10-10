@@ -1,5 +1,5 @@
-import metadata from '../../metadata.json';
-import cores from '../../cores.json';
+import metadata from '@/app/metadata.json';
+import cores from '@/app/cores.json';
 
 export interface SystemInfo {
   id: string;
