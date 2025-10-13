@@ -230,7 +230,7 @@ const MenuModal = () => {
       }
       dispatchMenu({ type: 'REPLACE_CURRENT', items: gamesMenu });
     }
-  }, [gameFiles, localSelectedSystem, selectedSystem, menuState.title, menuState.stack]);
+  }, [gameFiles, localSelectedSystem, selectedSystem, menuState.title, menuState.stack, dispatchMenu]);
 
   // Keyboard navigation
   const { selectedIndex, setSelectedIndex } = useKeyboardNavigation({
@@ -686,7 +686,20 @@ const MenuModal = () => {
           break;
       }
     }
-  }, [themeName, selectedVariant, selectedColorScheme, selectedAspectRatio, getParentMenuItemId, handleBack, menuState.stack.length, setSelectedIndex, source]);
+  }, [
+    themeName,
+    selectedVariant,
+    selectedColorScheme,
+    selectedAspectRatio,
+    getParentMenuItemId,
+    handleBack,
+    source,
+    dispatchMenu,
+    gameFiles,
+    selectedSystem,
+    setMgSelectedSystem,
+    menuState,
+  ]);
 
   // Effects
   useEffect(() => {
@@ -759,7 +772,20 @@ const MenuModal = () => {
       }
       // focusManager.clearFocusedElement();
     }
-  }, [isThemeSelectorOpen]);
+  }, [
+    isThemeSelectorOpen,
+    themeName,
+    selectedVariant,
+    selectedColorScheme,
+    selectedAspectRatio,
+    selectedSystem,
+    themeJson,
+    tempColorScheme,
+    view,
+    setView,
+    odUsername,
+    dispatchMenu,
+  ]);
 
   // Helper for toggling and refreshing system list
   const handleSystemToggle = (systemId: string) => {

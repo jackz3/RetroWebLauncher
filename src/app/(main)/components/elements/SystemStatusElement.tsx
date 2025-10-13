@@ -1,5 +1,5 @@
 'use client';
-import { getElementDefaultProps } from '../../../themeUtils';
+import { getElementDefaultProps } from '@/app/utils/themeUtils';
 
 interface SystemStatusElementProps {
   element: any;

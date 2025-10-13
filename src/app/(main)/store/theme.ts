@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ThemeJson } from '../../themeUtils';
+import { ThemeJson } from '@/app/utils/themeUtils';
 
 interface ThemeState {
   themeName: string;

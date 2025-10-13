@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { EmscriptenFS } from 'browserfs'
 import { useSearchParams } from 'next/navigation';
 import { browserFS } from '@/app/utils/fs';
@@ -47,9 +47,7 @@ export default function PlayPage() {
     const system = searchParams.get('s');
     const gameFile = searchParams.get('g');
 
-    const systems = (typeof window !== 'undefined' && window.localStorage && localStorage.getItem('systems'))
-    ? JSON.parse(localStorage.getItem('systems')!)
-    : {};
+    // NOTE: systems mapping is read on-demand inside the effect to avoid stale deps
 
     // Loading overlay state
     const [loading, setLoading] = useState(false);
@@ -57,61 +55,65 @@ export default function PlayPage() {
     const loadingLogsRef = useRef<string[]>([]);
     const [, forceRerender] = useState(0); // to refresh logs visual occasionally
 
-    const pushLog = (msg: string) => {
+    const pushLog = useCallback((msg: string) => {
         loadingLogsRef.current.push(msg);
         // Avoid too many renders; throttle by forcing a tiny rerender
         forceRerender(n => (n + 1) % 1000);
         // Keep console in sync for dev
         console.log('[PLAY]', msg);
-    };
-
-    function initModule() {
-        window.Module = {
-            noInitialRun: true,
-            arguments: ["-v", "--menu"],
-            encoder: new TextEncoder(),
-            message_queue: [],
-            message_out: [],
-            message_accum: "",
-            retroArchSend: function (msg: any) {
-                this.EmscriptenSendCommand(msg);
-            },
-            retroArchRecv: function () {
-                return this.EmscriptenReceiveCommandReply();
-            },
-            onRuntimeInitialized: function () {
-            },
-            print: function (text: string) {
-                console.log(text);
-                pushLog(text);
-            },
-            printErr: async function (text: string) {
-                console.log(text);
-                pushLog(text);
-                if (text === '[INFO] [Core]: Unloading core symbols..') {
-                    console.log('Game exited');
-                    pushLog('Game exited');
-                    window.Module.pauseMainLoop();
-                    window.Module._free();
-                    window.Module = null;
-                    // await browserFS.reset();
-                    window.parent.exitGame();
-                    // router.push('/gamelist?system=' + (system || ''));
-                    window.onbeforeunload = null;
-                    setLoading(false);
-                }
-            },
-            canvas: document.getElementById('canvas'),
-            totalDependencies: 0,
-            monitorRunDependencies: function (left: number) {
-                this.totalDependencies = Math.max(this.totalDependencies, left);
-            }
-        }
-    }
+    }, []);
 
     useEffect(() => {
         if (system && gameFile) {
-            const core = systems[system];// 'snes9x';
+            // Read systems mapping once when starting a game to determine the core
+            const systemsMap: Record<string, string> = (typeof window !== 'undefined' && window.localStorage && localStorage.getItem('systems'))
+                ? JSON.parse(localStorage.getItem('systems') as string)
+                : {};
+            const core = systemsMap[system as string];
+
+            function initModule() {
+                window.Module = {
+                    noInitialRun: true,
+                    arguments: ["-v", "--menu"],
+                    encoder: new TextEncoder(),
+                    message_queue: [],
+                    message_out: [],
+                    message_accum: "",
+                    retroArchSend: function (msg: any) {
+                        this.EmscriptenSendCommand(msg);
+                    },
+                    retroArchRecv: function () {
+                        return this.EmscriptenReceiveCommandReply();
+                    },
+                    onRuntimeInitialized: function () {
+                    },
+                    print: function (text: string) {
+                        console.log(text);
+                        pushLog(text);
+                    },
+                    printErr: async function (text: string) {
+                        console.log(text);
+                        pushLog(text);
+                        if (text === '[INFO] [Core]: Unloading core symbols..') {
+                            console.log('Game exited');
+                            pushLog('Game exited');
+                            window.Module.pauseMainLoop();
+                            window.Module._free();
+                            window.Module = null;
+                            // await browserFS.reset();
+                            window.parent.exitGame();
+                            // router.push('/gamelist?system=' + (system || ''));
+                            window.onbeforeunload = null;
+                            setLoading(false);
+                        }
+                    },
+                    canvas: document.getElementById('canvas'),
+                    totalDependencies: 0,
+                    monitorRunDependencies: function (left: number) {
+                        this.totalDependencies = Math.max(this.totalDependencies, left);
+                    }
+                };
+            }
             console.log('Starting game', system, gameFile, core);
             setLoading(true);
             setLoadingMessage('Preparing emulator...');
@@ -169,16 +171,17 @@ export default function PlayPage() {
                     throw err;
                 });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [system, gameFile]);
     return (
-      <div className='bg-black'>
-        <LoadingOverlay
-          show={loading}
-          title="Preparing to play"
-          message={loadingMessage}
-          logs={loadingLogsRef.current}
-        />
-        <canvas id="canvas" tabIndex={1} style={{ width: '100vw', height: '100vh', border: 'none', outline: 'none' }} onContextMenu={(event) => event.preventDefault()}></canvas>
-      </div>
+        <div className='bg-black'>
+            <LoadingOverlay
+                show={loading}
+                title="Preparing to play"
+                message={loadingMessage}
+                logs={loadingLogsRef.current}
+            />
+            <canvas id="canvas" tabIndex={1} style={{ width: '100vw', height: '100vh', border: 'none', outline: 'none' }} onContextMenu={(event) => event.preventDefault()}></canvas>
+        </div>
     );
 }

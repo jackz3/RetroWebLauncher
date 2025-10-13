@@ -1,5 +1,6 @@
 'use client';
 import React, { useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { getElementDefaultProps } from '@/app/utils/themeUtils';
 
 interface ImageElementProps {
@@ -129,12 +130,15 @@ function getOverlayStyles(config: ColorConfig): React.CSSProperties {
 
 const ImageElement = React.memo<ImageElementProps>(({ element, themeVariables = {}, themeName = '' }) => {
   const defaults = getElementDefaultProps('image');
-  const props = { ...defaults, ...element.properties };
+  const props = { ...defaults, ...element.properties } as ImageProperties;
   
-  // 解析位置和尺寸
-  const [posX, posY] = props.pos.split(' ').map(Number);
-  const [sizeW, sizeH] = props.size.split(' ').map(Number);
-  const [originX, originY] = props.origin.split(' ').map(Number);
+  // 解析位置和尺寸（带默认值保证安全）
+  const posStr = props.pos || '0 0';
+  const sizeStr = props.size || '1 1';
+  const originStr = props.origin || '0 0';
+  const [posX, posY] = posStr.split(' ').map(Number);
+  const [sizeW, sizeH] = sizeStr.split(' ').map(Number);
+  const [originX, originY] = originStr.split(' ').map(Number);
   
   // 计算实际位置（考虑 origin 锚点）
   const containerStyles: React.CSSProperties = useMemo(() => ({
@@ -159,11 +163,12 @@ const ImageElement = React.memo<ImageElementProps>(({ element, themeVariables = 
   }, [props.path, themeName]);
   
   // 创建颜色配置
-  const colorConfig = useMemo(() => createColorConfig(props), [
-    props.color,
-    props.colorEnd,
-    props.gradientType
-  ]);
+  const { color: propColor, colorEnd: propColorEnd, gradientType: propGradientType } = props;
+  const colorConfig = useMemo(() => createColorConfig({
+    color: propColor,
+    colorEnd: propColorEnd,
+    gradientType: propGradientType,
+  } as ImageProperties), [propColor, propColorEnd, propGradientType]);
   
   // 叠加层样式
   const overlayStyles = useMemo(() => {
@@ -189,11 +194,12 @@ const ImageElement = React.memo<ImageElementProps>(({ element, themeVariables = 
         display: 'block'
       };
     } else {
+      // For next/image with fill we style the wrapper; objectFit is applied via prop
       return {
         width: '100%',
         height: '100%',
-        objectFit: 'cover' as const,
-        display: 'block'
+        display: 'block',
+        position: 'relative'
       };
     }
   }, [props.tile, finalImagePath]);
@@ -214,12 +220,16 @@ const ImageElement = React.memo<ImageElementProps>(({ element, themeVariables = 
       {props.tile ? (
         <div style={imageStyles} />
       ) : (
-        <img
-          src={finalImagePath}
-          alt={element.name}
-          style={imageStyles}
-          onError={handleImageError}
-        />
+        <div style={imageStyles}>
+          <Image
+            src={finalImagePath || ''}
+            alt={element.name}
+            fill
+            sizes={`${sizeW * 100}vw`}
+            style={{ objectFit: 'cover' }}
+            onError={handleImageError as any}
+          />
+        </div>
       )}
       {colorConfig.needsOverlay && colorConfig.color.isValid && (
         <div style={overlayStyles} />

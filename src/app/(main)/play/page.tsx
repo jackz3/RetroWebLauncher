@@ -79,7 +79,7 @@ export default function PlayPage() {
     return () => {
       focusManager.unregisterElement('play-canvas');
     }
-    }, [view, system, gameFile]);
+    }, [view, system, gameFile, router]);
     return (
         <iframe src={`/laucher?s=${system}&g=${gameFile}`} className='fixed w-full h-full'></iframe>
     );

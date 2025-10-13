@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getElementDefaultProps } from '../../../themeUtils';
+import { getElementDefaultProps } from '@/app/utils/themeUtils';
 
 interface ClockElementProps {
   element: any;

@@ -14,6 +14,7 @@ export default function HelpSystemElement({ element, themeVariables = {}, themeN
   const { themeJson } = useTheme();
   const defaults = getElementDefaultProps('helpsystem');
   const props = { ...defaults, ...element.properties };
+  const { focusedElement } = useKeyboardStore();
   
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
@@ -150,8 +151,6 @@ export default function HelpSystemElement({ element, themeVariables = {}, themeN
   // const helpEntries = getHelpEntries();
   // 获取当前聚焦元素的帮助信息
   const getCurrentElementHelp = (): HelpEntry[] => {
-    const { focusedElement } = useKeyboardStore();
-    
     if (!focusedElement) {
       return helpEntries;
     }
@@ -225,6 +224,8 @@ export default function HelpSystemElement({ element, themeVariables = {}, themeN
                 style={{ gap: iconTextSpacingEm }}
               >
                 {iconUrl ? (
+                  // Small inline SVG icon from /public; next/image doesn't optimize SVG and complicates CSS filters.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img 
                     src={iconUrl} 
                     alt={entry.key} 
@@ -232,6 +233,8 @@ export default function HelpSystemElement({ element, themeVariables = {}, themeN
                       height: fontSize,
                       filter: `brightness(0) saturate(100%) invert(${iconInvert})` 
                     }}
+                    decoding="async"
+                    loading="eager"
                   />
                 ) : (
                   <span

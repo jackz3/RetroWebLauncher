@@ -1,4 +1,4 @@
-import { ThemeJson } from '../../../themeUtils';
+import { ThemeJson } from '@/app/utils/themeUtils';
 
 // Shared type for menu items
 export type MenuMeta =
@@ -49,7 +49,7 @@ export const MENU_STRUCTURE: MenuItem[] = [
     ]
   },
   { id: 'filesystem', label: 'VIRTUAL FILE SYSTEM' },
-  { id: 'onedrive', label: 'CONNECT ONEDRIVE' }
+  { id: 'onedrive', label: 'SET ONEDRIVE ROOT' }
 ];
 
 // Utility functions

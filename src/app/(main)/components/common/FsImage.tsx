@@ -21,6 +21,8 @@ type FsImageProps = {
  */
 export default function FsImage({ system, name, alt = '', className, style, candidates, mimeType = 'image/png' }: FsImageProps) {
   const [url, setUrl] = React.useState<string | undefined>(undefined);
+  // Extract a stable candidates list for deps
+  const candidateList = React.useMemo(() => (candidates && candidates.length > 0 ? candidates : undefined), [candidates]);
 
   React.useEffect(() => {
     let mounted = true;
@@ -29,8 +31,8 @@ export default function FsImage({ system, name, alt = '', className, style, cand
     async function load() {
       try {
         await browserFS.init();
-        const paths = candidates && candidates.length > 0
-          ? candidates
+        const paths = candidateList && candidateList.length > 0
+          ? candidateList
           : [
               `/media/screenshots/${system}/${name}.png`,
             //   `/media/${system}/screenshots/${name}.png`,
@@ -55,8 +57,11 @@ export default function FsImage({ system, name, alt = '', className, style, cand
       mounted = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [system, name, mimeType, JSON.stringify(candidates)]);
+  }, [system, name, mimeType, candidateList]);
 
   if (!url) return null;
-  return <img src={url} alt={alt} className={className} style={style} />;
+  // next/image doesn't support blob/object URLs generated at runtime from BrowserFS.
+  // Using a plain <img> here is intentional and safe; disable the Next.js lint rule for this specific case.
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt={alt} className={className} style={style} decoding="async" />;
 }

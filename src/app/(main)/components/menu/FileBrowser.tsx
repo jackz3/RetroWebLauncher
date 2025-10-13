@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import type { FsAdapter, FsEntry } from './fsTypes';
 
 type Props<T extends FsEntry = FsEntry> = {
@@ -52,13 +52,13 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIndex]);
 
-  const goParent = async () => {
+  const goParent = useCallback(async () => {
     const parent = adapter.parent(path);
     setPath(parent);
     setSelectedIndex(0);
-  };
+  }, [adapter, path, setPath, setSelectedIndex]);
 
-  const enter = async (index: number) => {
+  const enter = useCallback(async (index: number) => {
     if (hasParent && index === 0) return goParent();
     const entry = entries[index - offset];
     if (entry?.isDir) {
@@ -67,7 +67,7 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
       setSelectedIndex(0);
       onEnter?.(next, entry);
     }
-  };
+  }, [adapter, entries, goParent, hasParent, offset, onEnter, path, setPath, setSelectedIndex]);
 
   // allow external request to trigger enter on current selection
   useEffect(() => {
@@ -78,7 +78,7 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
   }, [enterRequestedAt]);
 
   // expose a helper for MenuModal to call on left-key to request delete
-  const requestDelete = async (index: number) => {
+  const requestDelete = useCallback(async (index: number) => {
     if (!enableDelete) return;
     const entry = entries[index - offset];
     if (!entry || entry.isDir) return;
@@ -90,7 +90,7 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
     } else {
       setPendingDelete(full);
     }
-  };
+  }, [enableDelete, entries, offset, adapter, path, pendingDelete]);
 
   useImperativeHandle(ref, () => ({ requestDelete, enter }), [requestDelete, enter]);
 
