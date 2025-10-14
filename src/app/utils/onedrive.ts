@@ -152,6 +152,60 @@ class OneDriveService {
     const buf = await res.arrayBuffer();
     return new Uint8Array(buf);
   }
+
+  // Ensure a folder (and its parent chain) exists at the given absolute path, e.g. "/retro/media"
+  async ensureFolder(absPath: string): Promise<void> {
+    const token = await this.acquireToken();
+    const parts = (absPath || '/')
+      .split('/')
+      .filter(Boolean);
+    let current = '';
+    for (const p of parts) {
+      const nextPath = `${current}/${p}`;
+      // Check if folder exists by listing parent and finding the child
+      const parentPath = current || '/';
+      const children = await this.listChildren(parentPath);
+      const exists = children.find((c) => c.name === p && c.isDir);
+      if (!exists) {
+        // Create folder under parent
+        const baseUrl = parentPath === '/'
+          ? 'https://graph.microsoft.com/v1.0/me/drive/root/children'
+          : `https://graph.microsoft.com/v1.0/me/drive/root:${encodeURI(parentPath)}:/children`;
+        const res = await fetch(baseUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: p,
+            folder: {},
+            '@microsoft.graph.conflictBehavior': 'replace'
+          })
+        });
+        if (!res.ok) {
+          throw new Error(`Failed to create folder ${nextPath}: ${res.status} ${res.statusText}`);
+        }
+      }
+      current = nextPath;
+    }
+  }
+
+  // Upload or overwrite a file at the given absolute path (e.g., "/retro/roms/nes/game.zip")
+  async uploadFile(absPath: string, data: ArrayBuffer | Uint8Array): Promise<void> {
+    const token = await this.acquireToken();
+    const url = this.makeContentUrl(absPath);
+    const arr = data instanceof Uint8Array ? new Uint8Array(data) : new Uint8Array(data);
+    const blob = new Blob([arr.buffer as ArrayBuffer]);
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: blob
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to upload to ${absPath}: ${res.status} ${res.statusText}`);
+    }
+  }
 }
 
 export const oneDrive = OneDriveService.getInstance();
