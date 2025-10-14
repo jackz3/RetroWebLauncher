@@ -1,12 +1,9 @@
 'use client'
 import { useThemeStore } from '@/app/(main)/store/theme';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { focusManager } from '../focusManager';
 import { ElementNavigation } from '../store/keyboard';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { browserFS } from '@/app/utils/fs';
-import { oneDrive } from '@/app/utils/onedrive';
-// import LoadingOverlay from '@/app/components/common/LoadingOverlay';
 
 declare global {
     interface Window {
@@ -17,33 +14,15 @@ declare global {
     }
 }
 
-// Async init using BrowserFS.configure, with clean async/await flow
-async function initRetroFs(platform: string, game: string): Promise<void> {
-    const src = `/roms/${platform}/${game}`;
-    const dst = `/home/web_user/retroarch/userdata/content/downloads/${game}`;
-
-    // Decide data source
-    const source = typeof window !== 'undefined' ? localStorage.getItem('source') : 'vfs';
-    let gameBuf: Buffer;
-    if (source === 'onedrive') {
-        const root = localStorage.getItem('onedrive-rootdir') || '';
-        const odPath = `${root}/roms/${platform}/${game}`;
-        await oneDrive.init();
-        if (!oneDrive.isSignedIn()) {
-            throw new Error('OneDrive selected but user is not signed in');
-        }
-        const data = await oneDrive.readFile(odPath);
-        gameBuf = Buffer.from(data);
-    } else {
-        gameBuf = await browserFS.readFile(src);
-    }
-
-    await browserFS.initRetroFs();
-
-    await browserFS.writeFile(dst, gameBuf);
+export default function PlayPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center text-white">Loading...</div>}>
+            <PlayPageContent />
+        </Suspense>
+    );
 }
 
-export default function PlayPage() {
+function PlayPageContent() {
     const searchParams = useSearchParams();
     const system = searchParams.get('s');
     const gameFile = searchParams.get('g');

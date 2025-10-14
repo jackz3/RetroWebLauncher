@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../ThemeProvider';
 import { getViewElements } from '@/app/utils/themeUtils';
@@ -12,6 +12,14 @@ import { oneDrive } from '@/app/utils/onedrive';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
 
 export default function GameListPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center text-white">Loading...</div>}>
+      <GameListContent />
+    </Suspense>
+  );
+}
+
+function GameListContent() {
   const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio } = useTheme();
   const { setView, gameListRefreshKey } = useThemeStore();
   const { focusedElement } = useKeyboardStore();

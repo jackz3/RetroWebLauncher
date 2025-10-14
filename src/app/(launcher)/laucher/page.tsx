@@ -1,6 +1,5 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { EmscriptenFS } from 'browserfs'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { browserFS } from '@/app/utils/fs';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
@@ -37,12 +36,21 @@ async function initRetroFs(platform: string, game: string): Promise<void> {
     await browserFS.initRetroFs();
     await browserFS.writeFile(dst, gameBuf);
 
+    const { EmscriptenFS } = await import('browserfs');
     const BFS = new EmscriptenFS(window.Module.FS, window.Module.PATH, window.Module.ERRNO_CODES);
     window.Module.FS.mount(BFS, { root: '/home' }, '/home');
     console.log('WEBPLAYER: BrowserFS configured and mounted for RetroArch');
 }
 
 export default function PlayPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center text-white">Loading...</div>}>
+            <LauncherContent />
+        </Suspense>
+    );
+}
+
+function LauncherContent() {
     const searchParams = useSearchParams();
     const system = searchParams.get('s');
     const gameFile = searchParams.get('g');
