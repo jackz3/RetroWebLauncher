@@ -13,6 +13,8 @@ type Props<T extends FsEntry = FsEntry> = {
   enableDelete?: boolean; // show delete affordance for files when navigating left
   onEnter?: (fullPath: string, entry: T | null) => void; // notify when user enters/open (dir only)
   enterRequestedAt?: number; // bump this number to request an enter at the current selectedIndex
+  onEntriesChange?: (entries: T[]) => void;
+  onPendingDeleteChange?: (pending: string | null) => void;
 };
 
 export type FileBrowserHandle = {
@@ -31,7 +33,9 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
   scrollContainerRef,
   enableDelete,
   onEnter,
-  enterRequestedAt
+  enterRequestedAt,
+  onEntriesChange,
+  onPendingDeleteChange
 }: Props<T>, ref: React.Ref<FileBrowserHandle>) {
   const [entries, setEntries] = useState<T[]>([]);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
@@ -40,17 +44,24 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
   const offset = hasParent ? 1 : 0;
 
   useEffect(() => {
-    adapter.list(path).then(setEntries);
+    adapter.list(path).then((list) => {
+      setEntries(list);
+      onEntriesChange?.(list);
+    });
     onTitle(`${titlePrefix}: ${path}`);
     // reset local UI flags when path changes
     setPendingDelete(null);
-  }, [adapter, path, onTitle, titlePrefix]);
+  }, [adapter, path, onTitle, titlePrefix, onEntriesChange]);
 
   // auto-clear pending delete when selection moves
   useEffect(() => {
     if (pendingDelete) setPendingDelete(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIndex]);
+
+  useEffect(() => {
+    onPendingDeleteChange?.(pendingDelete);
+  }, [pendingDelete, onPendingDeleteChange]);
 
   const goParent = useCallback(async () => {
     const parent = adapter.parent(path);
@@ -86,11 +97,13 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
     if (pendingDelete === full) {
       if (adapter.delete) await adapter.delete(full);
       setPendingDelete(null);
-      setEntries(await adapter.list(path));
+      const refreshed = await adapter.list(path);
+      setEntries(refreshed);
+      onEntriesChange?.(refreshed);
     } else {
       setPendingDelete(full);
     }
-  }, [enableDelete, entries, offset, adapter, path, pendingDelete]);
+  }, [enableDelete, entries, offset, adapter, path, pendingDelete, onEntriesChange]);
 
   useImperativeHandle(ref, () => ({ requestDelete, enter }), [requestDelete, enter]);
 

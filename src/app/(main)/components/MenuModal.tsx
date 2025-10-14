@@ -122,6 +122,18 @@ const MenuModal = () => {
     list: async (p) => (await oneDrive.listChildren(p)) as OdEntry[]
   }), []);
 
+  const handleVfsEntriesChange = useCallback((entries: FsEntry[]) => {
+    setVfsEntries(entries as Array<{ name: string; isDir: boolean; size?: number }>);
+  }, [setVfsEntries]);
+
+  const handleVfsPendingDeleteChange = useCallback((pending: string | null) => {
+    setVfsPendingDelete(pending);
+  }, [setVfsPendingDelete]);
+
+  const handleOdEntriesChange = useCallback((entries: FsEntry[]) => {
+    setOdEntries(entries as Array<{ id: string; name: string; isDir: boolean; size?: number }>);
+  }, [setOdEntries]);
+
   const setVfsTitle = useCallback((t: string) => {
     if (menuState.title !== t) {
       dispatchMenu({ type: 'SET_TITLE', title: t });
@@ -787,6 +799,12 @@ const MenuModal = () => {
     dispatchMenu,
   ]);
 
+  useEffect(() => {
+    if (!menuState.title.startsWith('VFS:') && vfsPendingDelete !== null) {
+      setVfsPendingDelete(null);
+    }
+  }, [menuState.title, vfsPendingDelete]);
+
   // Helper for toggling and refreshing system list
   const handleSystemToggle = (systemId: string) => {
     toggleSystemSelection(systemId);
@@ -839,23 +857,81 @@ const MenuModal = () => {
     return index === selectedIndex;
   };
 
+  const handleDeleteAction = useCallback(() => {
+    if (!menuState.title.startsWith('VFS:')) return;
+    vfsBrowserRef.current?.requestDelete(selectedIndex);
+  }, [menuState.title, selectedIndex, vfsBrowserRef]);
+
+  const handleSetOneDriveRoot = useCallback(() => {
+    if (!menuState.title.startsWith('ONEDRIVE:')) return;
+    const hasParent = odPath !== '/';
+    const offset = hasParent ? 1 : 0;
+    if (selectedIndex < offset) return;
+    const entry = odEntries[selectedIndex - offset];
+    if (!entry || !entry.isDir) return;
+    const base = odPath.endsWith('/') ? odPath.slice(0, -1) : odPath;
+    const next = `${base}/${entry.name}`;
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('onedrive-rootdir', next);
+      }
+    } catch {}
+  }, [menuState.title, odPath, odEntries, selectedIndex]);
+
+  const handleManageGamesDelete = useCallback(async () => {
+    if (menuState.title !== 'MANAGE GAMES') return;
+    const item = menuState.current[selectedIndex];
+    const meta = item?.meta as { kind?: string; systemId?: string; fileName?: string } | undefined;
+    if (!meta || meta.kind !== 'games-file' || !meta.systemId || !meta.fileName) return;
+    const result = await requestDeleteByMeta({ systemId: meta.systemId, fileName: meta.fileName });
+    if (result === 'deleted') {
+      try {
+        useThemeStore.getState().incrementGameListRefreshKey();
+      } catch {}
+    }
+  }, [menuState, selectedIndex, requestDeleteByMeta]);
+
   if (!isThemeSelectorOpen) return null;
 
   const isUiSettingsLevel = menuState.stack.length === 1 && menuState.stack[0][1]?.id === 'ui-settings';
   // Check if we are inside a UI submenu (e.g., Theme, Theme Variant, Theme Color Scheme, etc.)
   const isUiSettingsSubLevel = menuState.stack.length === 2 && menuState.stack[1][0]?.id.startsWith('theme-');
+  const showBackAction = menuState.stack.length > 0 || !!menuState.systemList;
+  const isVfsView = menuState.title.startsWith('VFS:');
+  const isOnedriveView = menuState.title.startsWith('ONEDRIVE:');
+  const isManageGamesView = menuState.title === 'MANAGE GAMES';
+  const vfsHasParent = vfsPath !== '/';
+  const vfsOffset = vfsHasParent ? 1 : 0;
+  const selectedVfsEntry = isVfsView && selectedIndex >= vfsOffset && selectedIndex - vfsOffset < vfsEntries.length
+    ? vfsEntries[selectedIndex - vfsOffset]
+    : null;
+  const selectedVfsEntryPath = selectedVfsEntry ? vfsAdapter.join(vfsPath, selectedVfsEntry.name) : null;
+  const vfsDeletePending = selectedVfsEntryPath ? vfsPendingDelete === selectedVfsEntryPath : false;
+  const canDeleteSelectedVfsEntry = !!(selectedVfsEntry && !selectedVfsEntry.isDir);
+  const odHasParent = odPath !== '/';
+  const odOffset = odHasParent ? 1 : 0;
+  const selectedOdEntry = isOnedriveView && selectedIndex >= odOffset && selectedIndex - odOffset < odEntries.length
+    ? odEntries[selectedIndex - odOffset]
+    : null;
+  const canSetRoot = !!(selectedOdEntry && selectedOdEntry.isDir);
+  const selectedManageGamesItem = isManageGamesView ? menuState.current[selectedIndex] : undefined;
+  const selectedManageGamesMeta = selectedManageGamesItem?.meta as { kind?: string; systemId?: string; fileName?: string } | undefined;
+  const canDeleteManageGamesSelection = !!(selectedManageGamesMeta && selectedManageGamesMeta.kind === 'games-file' && selectedManageGamesMeta.systemId && selectedManageGamesMeta.fileName);
+  const manageGamesDeletePending = canDeleteManageGamesSelection
+    ? isGamePending({ systemId: selectedManageGamesMeta!.systemId!, fileName: selectedManageGamesMeta!.fileName! })
+    : false;
 
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
-      <div className="bg-white rounded-lg p-4 w-1/2 max-w-[60vw] h-[60vh]">
+      <div className="bg-white rounded-lg p-4 w-1/2 max-w-[60vw] h-[60vh] flex flex-col">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">{menuState.title}</h2>
         </div>
 
-        <div className="mb-6">
+  <div className="flex-1 overflow-hidden mb-4">
           {menuState.systemList ? (
             <SystemList
               systems={menuState.systemList}
@@ -880,6 +956,8 @@ const MenuModal = () => {
                 scrollContainerRef={scrollContainerRef}
                 enableDelete
                 enterRequestedAt={fileBrowserEnterTick}
+                onEntriesChange={handleVfsEntriesChange}
+                onPendingDeleteChange={handleVfsPendingDeleteChange}
               />
             ) : menuState.title.startsWith('ONEDRIVE:') ? (
               <FileBrowser
@@ -896,6 +974,7 @@ const MenuModal = () => {
                 titlePrefix="ONEDRIVE"
                 scrollContainerRef={scrollContainerRef}
                 enterRequestedAt={fileBrowserEnterTick}
+                onEntriesChange={handleOdEntriesChange}
               />
             ) : menuState.title === 'MANAGE GAMES' ? (
               <ManageGames
@@ -983,9 +1062,12 @@ const MenuModal = () => {
               </div>
             )}
 
-          {(menuState.stack.length > 0 || menuState.systemList) && (
+        </div>
+
+  <div className="mt-auto pt-4 flex flex-wrap justify-end items-center gap-3">
+          {showBackAction && (
             <button
-              className="mt-4 text-blue-600 hover:text-blue-800 flex items-center"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-400 text-blue-600 hover:bg-gray-300 rounded-md"
               onClick={() => {
                 if (menuState.systemList) {
                   // Exit system list view
@@ -995,8 +1077,8 @@ const MenuModal = () => {
                   } else {
                     const newStack = menuState.stack.slice(0, -1);
                     const previousMenu = menuState.stack[menuState.stack.length - 1];
-                    const newTitle = newStack.length === 0 ? 'MAIN MENU' : 
-                      newStack[newStack.length - 1].find(item => 
+                    const newTitle = newStack.length === 0 ? 'MAIN MENU' :
+                      newStack[newStack.length - 1].find(item =>
                         item.subItems?.some(subItem => subItem.id === menuState.current[0]?.id)
                       )?.label || 'MENU';
                     dispatchMenu({ type: 'POP' });
@@ -1009,26 +1091,63 @@ const MenuModal = () => {
                 }
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-              </svg>
-              Back
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/help/button_b_XBOX.svg" alt="Back" className="h-4 w-4" />
+              <span>Back</span>
             </button>
           )}
-        </div>
 
-        <div className="flex justify-end space-x-3">
+          {isManageGamesView && (
+            <button
+              onClick={() => { void handleManageGamesDelete(); }}
+              disabled={!canDeleteManageGamesSelection}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md border border-transparent transition ${canDeleteManageGamesSelection ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-200 text-red-600 cursor-not-allowed opacity-60'}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/help/dpad_left.svg" alt="Delete" className="h-4 w-4" />
+              <span>{manageGamesDeletePending ? 'Confirm Del' : 'Delete'}</span>
+            </button>
+          )}
+
+          {isVfsView && (
+            <button
+              onClick={handleDeleteAction}
+              disabled={!canDeleteSelectedVfsEntry}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md border border-transparent transition ${canDeleteSelectedVfsEntry ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-200 text-red-600 cursor-not-allowed opacity-60'}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/help/dpad_left.svg" alt="Delete" className="h-4 w-4" />
+              <span>{vfsDeletePending ? 'Confirm Del' : 'Delete'}</span>
+            </button>
+          )}
+
+          {isOnedriveView && (
+            <button
+              onClick={handleSetOneDriveRoot}
+              disabled={!canSetRoot}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md border border-transparent transition ${canSetRoot ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-green-200 text-green-700 cursor-not-allowed opacity-60'}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/help/dpad_right.svg" alt="Set Root" className="h-4 w-4" />
+              <span>Set Root</span>
+            </button>
+          )}
+
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded-md bg-gray-400 hover:bg-gray-300"
           >
-            Cancel
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/help/button_start_XBOX.svg" alt="Close" className="h-4 w-4" />
+            <span>Close</span>
           </button>
           <button
             onClick={() => handleApply()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Apply
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/help/button_a_XBOX.svg" alt="Select" className="h-4 w-4" />
+            <span>Select</span>
           </button>
         </div>
       </div>
