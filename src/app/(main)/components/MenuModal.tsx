@@ -111,7 +111,8 @@ const MenuModal = () => {
     parent: (p) => p.replace(/\/?[^/]+\/?$/, '') || '/',
     join: (dir, name) => (dir.endsWith('/') ? dir.slice(0, -1) : dir) + '/' + name,
     list: async (p) => browserFS.readDirDetailed(p),
-    delete: async (p) => browserFS.deleteFile(p)
+    delete: async (p) => browserFS.deleteFile(p),
+    readFile: async (p) => browserFS.readFile(p)
   }), []);
   type OdEntry = { id: string; name: string; isDir: boolean; size?: number } & FsEntry;
   const odAdapter: FsAdapter<OdEntry> = useMemo(() => ({

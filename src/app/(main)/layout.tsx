@@ -1,5 +1,6 @@
 import '@/app/globals.css';
 import type { ReactNode } from 'react';
+import cores from '@/app/cores.json';
 import { ThemeProvider } from './ThemeProvider';
 import MenuModal from './components/MenuModal';
 import OneDriveInitializer from './OneDriveInitializer';
@@ -16,4 +17,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </body>
     </html>
   );
+}
+
+export async function generateStaticParams() {
+  return Object.keys(cores).map((system) => ({ system }));
 }

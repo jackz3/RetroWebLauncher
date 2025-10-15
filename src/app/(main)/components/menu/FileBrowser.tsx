@@ -69,16 +69,41 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
     setSelectedIndex(0);
   }, [adapter, path, setPath, setSelectedIndex]);
 
+  const downloadEntry = useCallback(async (entry: T) => {
+    if (!adapter.readFile) return;
+    if (typeof window === 'undefined') return;
+    try {
+      const fullPath = adapter.join(path, entry.name);
+      const data = await adapter.readFile(fullPath);
+      const blob = coerceToBlob(data);
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = entry.name;
+      // use a temporary anchor to prompt the browser download dialog
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('FileBrowser download failed', error);
+    }
+  }, [adapter, path]);
+
   const enter = useCallback(async (index: number) => {
     if (hasParent && index === 0) return goParent();
     const entry = entries[index - offset];
-    if (entry?.isDir) {
+    if (!entry) return;
+    if (entry.isDir) {
       const next = adapter.join(path, entry.name);
       setPath(next);
       setSelectedIndex(0);
       onEnter?.(next, entry);
+    } else {
+      await downloadEntry(entry);
     }
-  }, [adapter, entries, goParent, hasParent, offset, onEnter, path, setPath, setSelectedIndex]);
+  }, [adapter, downloadEntry, entries, goParent, hasParent, offset, onEnter, path, setPath, setSelectedIndex]);
 
   // allow external request to trigger enter on current selection
   useEffect(() => {
@@ -158,6 +183,19 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
     </div>
   );
 });
+
+function coerceToBlob(data: ArrayBuffer | ArrayBufferView | Blob | string): Blob | null {
+  if (data instanceof Blob) return data;
+  if (typeof data === 'string') return new Blob([data], { type: 'text/plain' });
+  if (data instanceof ArrayBuffer) return new Blob([data], { type: 'application/octet-stream' });
+  if (ArrayBuffer.isView(data)) {
+    const view = data as ArrayBufferView;
+    const copy = new Uint8Array(view.byteLength);
+    copy.set(new Uint8Array(view.buffer, view.byteOffset, view.byteLength));
+    return new Blob([copy.buffer], { type: 'application/octet-stream' });
+  }
+  return null;
+}
 
 // local helper to keep bytes formatting close; mirrors existing util in MenuModal
 function formatBytes(bytes?: number): string {

@@ -34,7 +34,7 @@ export default function SystemPage() {
   const handleSystemSelect = (index: number) => {
     const system = systemItems[index].system;
     setSelectedSystem(system);
-    router.push(`/gamelist?system=${system}`); // Navigate to gamelist with system query param
+    router.push(`/gamelist/${system}`); // Navigate to gamelist with system query param
   };
 
   const { openThemeSelector } = useModalStore();

@@ -12,4 +12,5 @@ export interface FsAdapter<T extends FsEntry = FsEntry> {
   join(dir: string, name: string): string;
   list(path: string): Promise<T[]>;
   delete?(path: string): Promise<void>;
+  readFile?(path: string): Promise<ArrayBuffer | ArrayBufferView | Blob | string>;
 }
