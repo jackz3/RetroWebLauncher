@@ -592,18 +592,17 @@ const MenuModal = () => {
       const selectedSystems = getSelectedSystems();
       
       // Format systems for display (object format)
-      const systemList: SystemItem[] = allSystems.map(system => ({
-        id: system.id,
-        label: `${system.id}: ${system.systemName}`,
-        isSelected: !!selectedSystems[system.id]
-      }));
-      
-      // Sort to show selected systems first
-      systemList.sort((a, b) => {
-        if (a.isSelected && !b.isSelected) return -1;
-        if (!a.isSelected && b.isSelected) return 1;
-        return 0;
-      });
+      const systemList: SystemItem[] = allSystems
+        .map(system => ({
+          id: system.id,
+          label: `${system.id}: ${system.systemName}`,
+          isSelected: !!selectedSystems[system.id]
+        }))
+        .sort((a, b) => {
+          if (a.isSelected && !b.isSelected) return -1;
+          if (!a.isSelected && b.isSelected) return 1;
+          return a.label.localeCompare(b.label, undefined, { sensitivity: 'base' });
+        });
       
       dispatchMenu({ type: 'PUSH', next: [], title: item.label });
       dispatchMenu({ type: 'SET_SYSTEM_LIST', list: systemList });
@@ -842,16 +841,17 @@ const MenuModal = () => {
     const updatedSelectedSystems = getSelectedSystems();
     // 同步到 Zustand store
     useThemeStore.getState().setSystems(updatedSelectedSystems);
-    const updatedSystemList: SystemItem[] = allSystems.map(system => ({
-      id: system.id,
-      label: `${system.id}: ${system.systemName}`,
-      isSelected: !!updatedSelectedSystems[system.id]
-    }));
-    updatedSystemList.sort((a, b) => {
-      if (a.isSelected && !b.isSelected) return -1;
-      if (!a.isSelected && b.isSelected) return 1;
-      return 0;
-    });
+    const updatedSystemList: SystemItem[] = allSystems
+      .map(system => ({
+        id: system.id,
+        label: `${system.id}: ${system.systemName}`,
+        isSelected: !!updatedSelectedSystems[system.id]
+      }))
+      .sort((a, b) => {
+        if (a.isSelected && !b.isSelected) return -1;
+        if (!a.isSelected && b.isSelected) return 1;
+        return a.label.localeCompare(b.label, undefined, { sensitivity: 'base' });
+      });
     dispatchMenu({ type: 'SET_SYSTEM_LIST', list: updatedSystemList });
   };
 

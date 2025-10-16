@@ -18,14 +18,16 @@ export default function SystemPage() {
     setView('system');
   }, [setView]);
 
-  const systemItems = Object.keys(systems).map(systemId => {
-    const meta = (metadata as Record<string, any>)[systemId];
-    return {
-      name: meta?.systemName || systemId,
-      description: `${meta?.games?.length ?? 0} games available`,
-      system: systemId
-    };
-  });
+  const systemItems = Object.keys(systems)
+    .map(systemId => {
+      const meta = (metadata as Record<string, any>)[systemId];
+      return {
+        name: meta?.systemName || systemId,
+        description: `${meta?.games?.length ?? 0} games available`,
+        system: systemId
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 
   const unresolvedIndex = selectedSystem ? systemItems.findIndex(item => item.system === selectedSystem) : 0;
   const selectedIndex = unresolvedIndex >= 0 ? unresolvedIndex : 0;
