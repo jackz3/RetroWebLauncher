@@ -20,6 +20,7 @@ type Props<T extends FsEntry = FsEntry> = {
 export type FileBrowserHandle = {
   requestDelete: (index: number) => Promise<void>;
   enter: (index: number) => Promise<void>;
+  refresh: () => Promise<void>;
 };
 
 export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntry = FsEntry>({
@@ -43,15 +44,18 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
   const hasParent = useMemo(() => !adapter.isRoot(path), [adapter, path]);
   const offset = hasParent ? 1 : 0;
 
+  const refresh = useCallback(async () => {
+    const list = await adapter.list(path);
+    setEntries(list);
+    onEntriesChange?.(list);
+  }, [adapter, path, onEntriesChange]);
+
   useEffect(() => {
-    adapter.list(path).then((list) => {
-      setEntries(list);
-      onEntriesChange?.(list);
-    });
+    void refresh();
     onTitle(`${titlePrefix}: ${path}`);
     // reset local UI flags when path changes
     setPendingDelete(null);
-  }, [adapter, path, onTitle, titlePrefix, onEntriesChange]);
+  }, [path, onTitle, titlePrefix, refresh]);
 
   // auto-clear pending delete when selection moves
   useEffect(() => {
@@ -122,15 +126,13 @@ export const FileBrowser = forwardRef(function FileBrowserInner<T extends FsEntr
     if (pendingDelete === full) {
       if (adapter.delete) await adapter.delete(full);
       setPendingDelete(null);
-      const refreshed = await adapter.list(path);
-      setEntries(refreshed);
-      onEntriesChange?.(refreshed);
+      await refresh();
     } else {
       setPendingDelete(full);
     }
-  }, [enableDelete, entries, offset, adapter, path, pendingDelete, onEntriesChange]);
+  }, [enableDelete, entries, offset, adapter, path, pendingDelete, refresh]);
 
-  useImperativeHandle(ref, () => ({ requestDelete, enter }), [requestDelete, enter]);
+  useImperativeHandle(ref, () => ({ requestDelete, enter, refresh }), [requestDelete, enter, refresh]);
 
   // Render UI
   return (

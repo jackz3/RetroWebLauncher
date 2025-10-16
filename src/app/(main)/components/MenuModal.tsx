@@ -78,6 +78,7 @@ const MenuModal = () => {
   } = useManageGames();
   // 文件上传 input ref
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const vfsUploadInputRef = useRef<HTMLInputElement>(null);
   // 局部系统选择
   const [localSelectedSystem, setLocalSelectedSystem] = useState<string | null>(null);
   // 全局 selectedSystem
@@ -122,6 +123,37 @@ const MenuModal = () => {
     join: (dir, name) => (dir.endsWith('/') ? dir.slice(0, -1) : dir) + '/' + name,
     list: async (p) => (await oneDrive.listChildren(p)) as OdEntry[]
   }), []);
+
+  const handleVfsUploadClick = useCallback(() => {
+    if (!vfsUploadInputRef.current) return;
+    vfsUploadInputRef.current.value = '';
+    vfsUploadInputRef.current.click();
+  }, []);
+
+  const handleVfsFilesSelected = useCallback(async (files: FileList) => {
+    if (!files || files.length === 0) return;
+    try {
+      await browserFS.ensureDir(vfsPath);
+      for (const file of Array.from(files)) {
+        const destination = vfsAdapter.join(vfsPath, file.name);
+        const data = await file.arrayBuffer();
+        await browserFS.saveGameFile(destination, data);
+      }
+      setVfsPendingDelete(null);
+      if (vfsBrowserRef.current) {
+        await vfsBrowserRef.current.refresh();
+      } else {
+        const refreshedEntries = await browserFS.readDirDetailed(vfsPath);
+        setVfsEntries(refreshedEntries);
+      }
+    } catch (error) {
+      console.error('VFS upload failed', error);
+    } finally {
+      if (vfsUploadInputRef.current) {
+        vfsUploadInputRef.current.value = '';
+      }
+    }
+  }, [vfsPath, vfsAdapter, setVfsEntries, setVfsPendingDelete, vfsBrowserRef]);
 
   const buildRootMenu = useCallback((sourceValue: 'vfs' | 'onedrive') => {
     const selectedSystemsObj = getSelectedSystems();
@@ -957,6 +989,17 @@ const MenuModal = () => {
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
       <div className="bg-white rounded-lg p-4 w-1/2 max-w-[60vw] h-[60vh] flex flex-col">
+        <input
+          ref={vfsUploadInputRef}
+          type="file"
+          className="hidden"
+          multiple
+          onChange={(event) => {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            void handleVfsFilesSelected(files);
+          }}
+        />
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">{menuState.title}</h2>
         </div>
@@ -1140,15 +1183,25 @@ const MenuModal = () => {
           )}
 
           {isVfsView && (
-            <button
-              onClick={handleDeleteAction}
-              disabled={!canDeleteSelectedVfsEntry}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md border border-transparent transition ${canDeleteSelectedVfsEntry ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-200 text-red-600 cursor-not-allowed opacity-60'}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/help/dpad_left.svg" alt="Delete" className="h-4 w-4" />
-              <span>{vfsDeletePending ? 'Confirm Del' : 'Delete'}</span>
-            </button>
+            <>
+              <button
+                onClick={handleVfsUploadClick}
+                className="flex items-center gap-2 px-4 py-2 rounded-md border border-transparent transition bg-green-600 text-white hover:bg-green-700"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/help/button_y_XBOX.svg" alt="Upload" className="h-4 w-4" />
+                <span>Upload</span>
+              </button>
+              <button
+                onClick={handleDeleteAction}
+                disabled={!canDeleteSelectedVfsEntry}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md border border-transparent transition ${canDeleteSelectedVfsEntry ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-200 text-red-600 cursor-not-allowed opacity-60'}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/help/dpad_left.svg" alt="Delete" className="h-4 w-4" />
+                <span>{vfsDeletePending ? 'Confirm Del' : 'Delete'}</span>
+              </button>
+            </>
           )}
 
           {isOnedriveView && (
