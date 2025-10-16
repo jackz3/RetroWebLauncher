@@ -9,7 +9,8 @@ export type MenuMeta =
   | { kind: 'games-select-system' }
   | { kind: 'games-system'; systemId: string }
   | { kind: 'games-upload' }
-  | { kind: 'games-file'; systemId: string; fileName: string };
+  | { kind: 'games-file'; systemId: string; fileName: string }
+  | { kind: 'general-reset' };
 
 export interface MenuItem {
   id: string;
@@ -35,7 +36,14 @@ export const MENU_STRUCTURE: MenuItem[] = [
     label: 'UI SETTINGS',
     subItems: []
   },
-  { id: 'scraper', label: 'SCRAPER' },
+  // { id: 'scraper', label: 'SCRAPER' },
+  {
+    id: 'general',
+    label: 'GENERAL',
+    subItems: [
+      { id: 'general-reset', label: 'RESET', meta: { kind: 'general-reset' as const } }
+    ]
+  },
   { id: 'systems', label: 'MANAGE SYSTEMS' },
   // 动态设置 disabled，初始为 false
   { id: 'emulators', label: 'MANAGE EMULATORS' },

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { browserFS } from '@/app/utils/fs';
 import { oneDrive } from '@/app/utils/onedrive';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
+import { useThemeStore } from './store/theme';
 import cores from '../cores.json';
 
 type DemoSpec = {
@@ -23,6 +24,7 @@ export default function Page() {
   const [configured, setConfigured] = useState<boolean | null>(null); // null = not yet checked
   const logsRef = useRef<string[]>([]);
   const [, forceRerender] = useState(0);
+  const setSystems = useThemeStore((state) => state.setSystems);
 
   const pushLog = (msg: string) => {
     logsRef.current.push(msg);
@@ -69,7 +71,8 @@ export default function Page() {
       }
     });
     localStorage.setItem('systems', JSON.stringify(mapping));
-  }, []);
+    setSystems(mapping);
+  }, [setSystems]);
 
   const handleStart = useCallback(async () => {
     if (busy) return;

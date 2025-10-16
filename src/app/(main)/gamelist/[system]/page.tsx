@@ -10,14 +10,6 @@ import { browserFS } from '@/app/utils/fs';
 import { oneDrive } from '@/app/utils/onedrive';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
 
-// export default function GameListPage() {
-//   return (
-//     <Suspense fallback={<div className="flex h-screen items-center justify-center text-white">Loading...</div>}>
-//       <GameListContent />
-//     </Suspense>
-//   );
-// }
-
 export default function GameListContent() {
   const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio } = useTheme();
   const { setView, gameListRefreshKey } = useThemeStore();
@@ -201,13 +193,6 @@ export default function GameListContent() {
           />
         );
       })}
-
-      <div className="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white p-4 rounded text-sm">
-        <div>Theme: {themeJson.name}</div>
-        <div>Elements: {gamelistElements.length}</div>
-        <div>Selected: {gameList[0]?.name}</div>
-        <div>System: {selectedSystem || 'All Systems'}</div>
-      </div>
     </div>
   );
 }

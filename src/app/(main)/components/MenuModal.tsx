@@ -123,6 +123,27 @@ const MenuModal = () => {
     list: async (p) => (await oneDrive.listChildren(p)) as OdEntry[]
   }), []);
 
+  const buildRootMenu = useCallback((sourceValue: 'vfs' | 'onedrive') => {
+    const selectedSystemsObj = getSelectedSystems();
+    const hasSelectedSystems = Object.keys(selectedSystemsObj).length > 0;
+
+    return MENU_STRUCTURE.map(item => {
+      if (item.id === 'ui-settings' && item.subItems) {
+        return { ...item, subItems: buildCapabilitiesMenu(themeJson) };
+      }
+      if (item.id === 'emulators') {
+        return { ...item, disabled: !hasSelectedSystems };
+      }
+      if (item.id === 'source') {
+        return { ...item, label: sourceValue === 'onedrive' ? 'SOURCE ONEDRIVE' : 'SOURCE VFS' };
+      }
+      if (item.id === 'onedrive') {
+        return { ...item, label: odUsername ? `ONEDRIVE (${odUsername})` : 'CONNECT ONEDRIVE' };
+      }
+      return { ...item };
+    });
+  }, [themeJson, odUsername]);
+
   const handleVfsEntriesChange = useCallback((entries: FsEntry[]) => {
     setVfsEntries(entries as Array<{ name: string; isDir: boolean; size?: number }>);
   }, [setVfsEntries]);
@@ -471,8 +492,30 @@ const MenuModal = () => {
         const list = await browserFS.readDirDetailed(root);
         setVfsEntries(list);
         setVfsPendingDelete(null);
-  dispatchMenu({ type: 'PUSH', next: [{ id: 'vfs-root', label: 'ROOT' }], title: `VFS: ${root}` });
+        dispatchMenu({ type: 'PUSH', next: [{ id: 'vfs-root', label: 'ROOT' }], title: `VFS: ${root}` });
       })();
+      return;
+    }
+    if (item.meta?.kind === 'general-reset' || item.id === 'general-reset') {
+      if (typeof window !== 'undefined') {
+        const keysToClear = ['source', 'systems', 'theme-settings', 'onedrive-rootdir'];
+        keysToClear.forEach(key => {
+          try {
+            window.localStorage.removeItem(key);
+          } catch (error) {
+            console.warn(`Failed to remove ${key} from localStorage`, error);
+          }
+        });
+      }
+      useThemeStore.getState().clearPersistedSettings();
+      useThemeStore.getState().setSystems({});
+      useThemeStore.getState().setSelectedSystem(null);
+      setLocalSelectedSystem(null);
+      setMgSelectedSystem(null);
+      clearGamePending();
+      setSource('vfs');
+      const refreshedMenu = buildRootMenu('vfs');
+      dispatchMenu({ type: 'RESET', current: refreshedMenu, title: 'MAIN MENU' });
       return;
     }
     // Handle "MANAGE GAMES" menu item
@@ -712,6 +755,8 @@ const MenuModal = () => {
     selectedSystem,
     setMgSelectedSystem,
     menuState,
+    clearGamePending,
+    buildRootMenu,
   ]);
 
   // Effects
@@ -730,9 +775,6 @@ const MenuModal = () => {
       console.log('MenuModal useEffect: tempColorScheme', tempColorScheme);
       console.log('MenuModal useEffect: previousViewRef', previousViewRef.current);
       console.log('MenuModal useEffect: current view', view);
-      // 动态设置 MANAGE EMULATORS 的禁用状态
-      const selectedSystemsObj = getSelectedSystems();
-      const hasSelectedSystems = Object.keys(selectedSystemsObj).length > 0;
       // 初始化 source（默认 vfs）
       let initialSource: 'vfs' | 'onedrive' = 'vfs';
       try {
@@ -742,21 +784,7 @@ const MenuModal = () => {
         }
       } catch {}
       setSource(initialSource);
-      const updatedMenu = MENU_STRUCTURE.map(item => {
-        if (item.id === 'ui-settings' && item.subItems) {
-          return { ...item, subItems: buildCapabilitiesMenu(themeJson) };
-        }
-        if (item.id === 'emulators') {
-          return { ...item, disabled: !hasSelectedSystems };
-        }
-        if (item.id === 'source') {
-          return { ...item, label: initialSource === 'onedrive' ? 'SOURCE ONEDRIVE' : 'SOURCE VFS' };
-        }
-        if (item.id === 'onedrive') {
-          return { ...item, label: odUsername ? `ONEDRIVE (${odUsername})` : 'CONNECT ONEDRIVE' };
-        }
-        return item;
-      });
+      const updatedMenu = buildRootMenu(initialSource);
       dispatchMenu({ type: 'RESET', current: updatedMenu, title: 'MAIN MENU' });
       setView('menu'); // Set view to 'menu' when modal opens
       focusManager.focusElement('menu-modal');
@@ -798,6 +826,7 @@ const MenuModal = () => {
     setView,
     odUsername,
     dispatchMenu,
+    buildRootMenu,
   ]);
 
   useEffect(() => {

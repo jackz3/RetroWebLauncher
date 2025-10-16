@@ -7,18 +7,17 @@ import ElementRenderer from '../components/ElementRenderer';
 import { useModalStore } from '../store/modal';
 import { useThemeStore } from '../store/theme'; // Import useThemeStore
 import metadata from '../../metadata.json';
+import DebugInfoOverlay from '../components/common/DebugInfoOverlay';
 
 export default function SystemPage() {
   const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio, themeName } = useTheme(); // Get selectedVariant and selectedColorScheme
-  const { setView, selectedSystem, setSelectedSystem } = useThemeStore(); // Get setView function
+  const { setView, selectedSystem, setSelectedSystem, systems } = useThemeStore(); // Get setView function
   
   // Set view to 'system' when component mounts
   useEffect(() => {
     setView('system');
   }, [setView]);
-  
-  // 使用 Zustand store 的 systems
-  const { systems } = useThemeStore();
+
   const systemItems = Object.keys(systems).map(systemId => {
     const meta = (metadata as Record<string, any>)[systemId];
     return {
@@ -28,7 +27,8 @@ export default function SystemPage() {
     };
   });
 
-  const selectedIndex = selectedSystem ? systemItems.findIndex(item => item.system === selectedSystem) : 0;
+  const unresolvedIndex = selectedSystem ? systemItems.findIndex(item => item.system === selectedSystem) : 0;
+  const selectedIndex = unresolvedIndex >= 0 ? unresolvedIndex : 0;
   const router = useRouter(); // Initialize useRouter
 
   const handleSystemSelect = (index: number) => {
@@ -78,11 +78,11 @@ export default function SystemPage() {
       })}
       
       {/* 调试信息覆盖层 */}
-      <div className="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white p-4 rounded text-sm">
-        <div>Theme: {themeJson.name}</div>
-        <div>Elements: {systemElements.length}</div>
-        <div>Selected: {Object.keys(systems)[0]}</div>
-      </div>
+      <DebugInfoOverlay
+        themeName={themeJson.name}
+        elementsCount={systemElements.length}
+        selectedLabel={systemItems[selectedIndex]?.system || 'N/A'}
+      />
     </div>
   );
 }

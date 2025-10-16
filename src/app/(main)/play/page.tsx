@@ -37,7 +37,7 @@ function PlayPageContent() {
     useEffect(() => {
         if (system && gameFile && view === 'play') {
             window.exitGame = () => {
-                router.push('/gamelist?system=' + (system || ''));
+                router.push('/gamelist/' + (system || ''));
             }
             const playElement: ElementNavigation = {
                 id: 'play-canvas',
