@@ -75,7 +75,6 @@ export default function CarouselElement({
   
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
-  console.log('CarouselElement props:', props); 
   // 防御性处理：items 为空时不渲染内容
   if (!Array.isArray(items) || items.length === 0) {
     return null;

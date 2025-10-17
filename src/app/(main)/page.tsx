@@ -150,10 +150,21 @@ export default function Page() {
         await ensureDirChain([
           '/roms',
           '/media',
+          '/config',
           ...targetSystems.map((s) => `/roms/${s}`),
           ...((demo.media || []).map((m) => `/media/${m}`)),
           ...((demo.media || []).flatMap((m) => targetSystems.map((s) => `/media/${m}/${s}`))),
         ]);
+
+        setLoadingMessage('Copying configuration...');
+        pushLog('Copying RetroArch config to VFS...');
+        const retroConfigSrc = '/cfg/retroarch.cfg';
+        const retroConfigBuf = await fetchArrayBufferIfExists(retroConfigSrc);
+        if (!retroConfigBuf) {
+          throw new Error('Required RetroArch config not found at /cfg/retroarch.cfg');
+        }
+        await browserFS.saveGameFile('/config/retroarch.cfg', retroConfigBuf);
+        pushLog('Saved config: /config/retroarch.cfg');
 
         if (copyDemo) {
           setLoadingMessage('Copying demo ROMs and media...');
