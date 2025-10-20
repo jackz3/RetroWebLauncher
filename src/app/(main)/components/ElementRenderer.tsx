@@ -19,6 +19,7 @@ interface ElementRendererProps {
   selectedIndex?: number;
   onItemSelect?: (index: number) => void;
   onBack?: () => void;
+  onEscape?: () => void;
   view: 'system' | 'gamelist' | 'menu';
 }
 
@@ -31,6 +32,7 @@ export default function ElementRenderer({
   item = undefined,
   onItemSelect,
   onBack,
+  onEscape,
   view,
 }: ElementRendererProps) {
   const { type } = element;
@@ -83,6 +85,7 @@ export default function ElementRenderer({
           selectedIndex={selectedIndex}
           onItemSelect={onItemSelect}
           onBack={onBack}
+          onEscape={onEscape}
           view={view}
         />
       );
@@ -96,6 +99,7 @@ export default function ElementRenderer({
           selectedIndex={selectedIndex}
           onItemSelect={onItemSelect}
           onBack={onBack}
+          onEscape={onEscape}
           themeName={themeName}
         />
       );
@@ -110,6 +114,7 @@ export default function ElementRenderer({
           selectedIndex={selectedIndex}
           onItemSelect={onItemSelect}
           onBack={onBack}
+          onEscape={onEscape}
           view={view}
         />
       );

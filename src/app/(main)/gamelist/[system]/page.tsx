@@ -6,6 +6,8 @@ import { getViewElements } from '@/app/utils/themeUtils';
 import ElementRenderer from '../../components/ElementRenderer';
 import { useThemeStore } from '../../store/theme';
 import { useKeyboardStore } from '../../store/keyboard';
+import { useModalStore } from '../../store/modal';
+import { focusManager } from '../../focusManager';
 import { browserFS } from '@/app/utils/fs';
 import { oneDrive } from '@/app/utils/onedrive';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
@@ -34,6 +36,7 @@ export default function GameListContent() {
 
   useEffect(() => {
     setView('gamelist');
+    focusManager.clearFocusStack();
   }, [setView]);
 
   useEffect(() => {
@@ -155,6 +158,8 @@ export default function GameListContent() {
     router.push(`/play?s=${selectedGame.system}&g=${selectedGame.file}`);
   };
 
+  const { openThemeSelector } = useModalStore();
+
   if (!themeJson || !selectedVariant || !selectedAspectRatio) {
     return <div>Loading...</div>;
   }
@@ -189,6 +194,7 @@ export default function GameListContent() {
             item={element.type === 'text' ? selectedGame : undefined}
             onItemSelect={isList ? handleGameSelect : undefined}
             onBack={handleBack}
+            onEscape={openThemeSelector}
             view="gamelist"
           />
         );

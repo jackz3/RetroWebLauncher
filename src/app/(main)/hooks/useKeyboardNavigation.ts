@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useKeyboardStore, ElementNavigation } from '../store/keyboard';
 import { keyboardManager, KeyboardAction } from '../keyboardManager';
 import { focusManager } from '../focusManager';
@@ -9,16 +9,69 @@ interface UseKeyboardNavigationOptions {
   elementType: 'textlist' | 'carousel' | 'grid' | 'menu' | 'play';
   totalItems: number;
   initialIndex?: number;
-  // Number of columns in a grid; when provided, ArrowUp/Down will move by this step.
   gridColumns?: number;
-  resetDeps?: any[]; // when these deps change, reset selectedIndex to initialIndex
-  resetToIndex?: number; // override initialIndex on reset
+  resetDeps?: any[];
+  resetToIndex?: number;
   onSelect?: (index: number) => void;
   onEscape?: () => void;
   onBack?: () => void;
   onNavigate?: (direction: 'up' | 'down' | 'left' | 'right', index: number) => void;
   isEnabled?: boolean;
 }
+
+// 网格导航计算工具函数
+const gridNavigationUtils = {
+  getRowAndCol: (index: number, cols: number) => ({
+    row: Math.floor(index / cols),
+    col: index % cols
+  }),
+  
+  getTotalRows: (totalItems: number, cols: number) => Math.ceil(totalItems / cols),
+  
+  getNewIndex: (index: number, direction: 'up' | 'down' | 'left' | 'right', cols: number, totalItems: number): number => {
+    const { row, col } = gridNavigationUtils.getRowAndCol(index, cols);
+    const totalRows = gridNavigationUtils.getTotalRows(totalItems, cols);
+    let newIndex = index;
+    
+    switch (direction) {
+      case 'up':
+        if (row > 0) {
+          newIndex = (row - 1) * cols + col;
+          if (newIndex >= totalItems) newIndex = Math.min(col, totalItems - 1);
+        }
+        break;
+      case 'down':
+        if (row < totalRows - 1) {
+          newIndex = (row + 1) * cols + col;
+          if (newIndex >= totalItems) newIndex = totalItems - 1;
+        }
+        break;
+      case 'left':
+        newIndex = index > 0 ? index - 1 : 0;
+        break;
+      case 'right':
+        newIndex = index < totalItems - 1 ? index + 1 : totalItems - 1;
+        break;
+    }
+    
+    return newIndex;
+  },
+  
+  canNavigate: (index: number, direction: 'up' | 'down' | 'left' | 'right', cols: number, totalItems: number): boolean => {
+    const { row } = gridNavigationUtils.getRowAndCol(index, cols);
+    const totalRows = gridNavigationUtils.getTotalRows(totalItems, cols);
+    
+    switch (direction) {
+      case 'up':
+        return row > 0;
+      case 'down':
+        return row < totalRows - 1;
+      case 'left':
+      case 'right':
+        return true;
+    }
+  }
+};
 
 export const useKeyboardNavigation = ({
   key,
@@ -35,155 +88,106 @@ export const useKeyboardNavigation = ({
   onNavigate,
   isEnabled = true
 }: UseKeyboardNavigationOptions) => {
-  const { focusedElement, updateElementNavigation } = useKeyboardStore();
+  const { focusedElement } = useKeyboardStore();
   
-  // 当前选中索引
-  const selectedIndex = focusedElement?.id === elementId ? focusedElement.selectedIndex : initialIndex;
+  // 使用本地状态管理选中索引，避免依赖全局 focusedElement
+  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
   
-  // 更新元素导航状态
-  const updateNavigation = useCallback((updates: Partial<ElementNavigation>) => {
-    updateElementNavigation(elementId, updates);
-  }, [elementId, updateElementNavigation]);
+  const cols = useMemo(() => {
+    if (gridColumns) return gridColumns;
+    const defaultCols = Math.floor(Math.sqrt(totalItems)) || 1;
+    return Math.max(1, defaultCols);
+  }, [gridColumns, totalItems]);
+  const isGrid = elementType === 'grid';
   
-  // 注册元素
+    // 注册元素
   useEffect(() => {
-    // if (!isEnabled) {
-    //   focusManager.unregisterElement(elementId);
-    //   return;
-    // }
-    
     return () => {
       focusManager.unregisterElement(elementId);
     };
-  }, [elementId, isEnabled]);
+  }, [elementId]);
   
+  // 初始化时注册元素（仅依赖于 elementId）
   useEffect(() => {
     if (!isEnabled) return;
-    // 对于TextList等非Grid元素，上下导航总是可用（支持循环）
-    const canNavigateUp = elementType === 'grid' ? initialIndex > 0 : true;
-    const canNavigateDown = elementType === 'grid' ? initialIndex < totalItems - 1 : true;
     
     const elementNavigation: ElementNavigation = {
       id: elementId,
       type: elementType,
       totalItems,
-      selectedIndex: initialIndex,
+      selectedIndex,
       canNavigate: {
-        up: canNavigateUp,
-        down: canNavigateDown,
-        left: true,
-        right: true,
-        select: true,
-        back: true
+        up: true, down: true, left: true, right: true, select: true, back: true
       }
     };
     
     focusManager.registerElement(elementNavigation);
-
-  }, [elementId, elementType, totalItems, initialIndex, isEnabled]);
-
-  // dependency-driven reset of selection index
+  }, [elementId, elementType, totalItems, isEnabled]);
+  
+  // 当 selectedIndex 变化时，更新焦点元素的信息
   useEffect(() => {
     if (!isEnabled) return;
-    const idx = typeof resetToIndex === 'number' ? resetToIndex : initialIndex;
-    updateNavigation({ selectedIndex: idx });
+    focusManager.updateElementNavigation(elementId, { selectedIndex });
+  }, [elementId, selectedIndex, isEnabled]);
+
+  // 依赖变化时重置选中索引
+  useEffect(() => {
+    if (!isEnabled) return;
+    if (typeof resetToIndex === 'number') {
+      setSelectedIndex(resetToIndex);
+    } else {
+      setSelectedIndex(initialIndex);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEnabled, initialIndex, resetToIndex, ...(Array.isArray(resetDeps) ? resetDeps : [])]);
-  // 键盘事件处理器
+  
+  // 更新导航状态
+  const updateNavigationState = useCallback((newIndex: number) => {
+    setSelectedIndex(newIndex);
+  }, []);
+
+  // 键盘事件处理器（使用 ref 获取最新的焦点元素，避免依赖变化导致频繁重新创建）
+  const focusedElementRef = useRef<ElementNavigation | null>(null);
+  
+  useEffect(() => {
+    focusedElementRef.current = focusedElement;
+  }, [focusedElement]);
+
   const handleKeyboardAction = useCallback((action: KeyboardAction, event: KeyboardEvent): boolean => {
-    if (focusedElement?.id !== elementId) return false;
+    // 使用 ref 检查焦点，而不是依赖
+    if (focusedElementRef.current?.id !== elementId) {
+      console.log(`[useKeyboardNavigation] 焦点不匹配: focusedElement=${focusedElementRef.current?.id}, elementId=${elementId}`);
+      return false;
+    }
+    
+    console.log(`[useKeyboardNavigation] 处理 action=${action}, elementId=${elementId}, selectedIndex=${selectedIndex}`);
     
     let newIndex = selectedIndex;
-  const cols = Math.max(1, ((gridColumns ?? Math.floor(Math.sqrt(totalItems))) || 1));
+    let shouldUpdate = false;
     
     switch (action) {
       case 'navigateUp':
-        if (elementType === 'grid') {
-          // Grid元素的上导航：移动到上一行的同一列
-          const itemsPerRow = cols;
-          const currentRow = Math.floor(selectedIndex / itemsPerRow);
-          const currentCol = selectedIndex % itemsPerRow;
-          
-          if (currentRow > 0) {
-            newIndex = selectedIndex - itemsPerRow;
-            // 确保不超过总项目数
-            if (newIndex >= totalItems) {
-              newIndex = (currentRow - 1) * itemsPerRow + Math.min(currentCol, (totalItems - 1) % itemsPerRow);
-            }
-          }
-        } else {
-          // 其他元素类型的上导航（支持循环）
-          if (selectedIndex > 0) {
-            newIndex = selectedIndex - 1;
-          } else {
-            // 如果在第一项，循环到最后一项
-            newIndex = totalItems - 1;
-          }
-        }
-        onNavigate?.('up', newIndex);
-        break;
       case 'navigateDown':
-        if (elementType === 'grid') {
-          // Grid元素的下导航：移动到下一行的同一列
-          const itemsPerRow = cols;
-          const currentRow = Math.floor(selectedIndex / itemsPerRow);
-          const currentCol = selectedIndex % itemsPerRow;
-          const totalRows = Math.ceil(totalItems / itemsPerRow);
-          
-          if (currentRow < totalRows - 1) {
-            newIndex = selectedIndex + itemsPerRow;
-            // 确保不超过总项目数
-            if (newIndex >= totalItems) {
-              newIndex = (currentRow + 1) * itemsPerRow + Math.min(currentCol, (totalItems - 1) % itemsPerRow);
-            }
-          }
-        } else {
-          // 其他元素类型的下导航（支持循环）
-          if (selectedIndex < totalItems - 1) {
-            newIndex = selectedIndex + 1;
-          } else {
-            // 如果在最后一项，循环到第一项
-            newIndex = 0;
-          }
-        }
-        onNavigate?.('down', newIndex);
-        break;
       case 'navigateLeft':
-        // 处理网格布局的左导航；非 grid 转发给 onNavigate 以支持自定义行为（如 VFS 删除确认）
-        if (elementType === 'grid') {
-          const itemsPerRow = cols;
-          // 修改为跨行移动：在行首时移动到上一行末尾
-          if (selectedIndex % itemsPerRow > 0) {
-            newIndex = selectedIndex - 1;
-          } else {
-            // 在行首时移动到上一行末尾
-            newIndex = selectedIndex - 1;
-          }
-          // Clamp 至合法范围
-          if (newIndex < 0) newIndex = 0;
-          onNavigate?.('left', newIndex);
+      case 'navigateRight': {
+        if (isGrid) {
+          newIndex = gridNavigationUtils.getNewIndex(selectedIndex, action.replace('navigate', '').toLowerCase() as any, cols, totalItems);
         } else {
-          onNavigate?.('left', selectedIndex);
+          // 非Grid元素支持循环
+          const directions: Record<string, number> = {
+            navigateUp: -1,
+            navigateDown: 1,
+            navigateLeft: -1,
+            navigateRight: 1
+          };
+          const step = directions[action] || 0;
+          newIndex = (selectedIndex + step + totalItems) % totalItems;
         }
+        shouldUpdate = newIndex !== selectedIndex;
+        onNavigate?.(action.replace('navigate', '').toLowerCase() as any, newIndex);
+        console.log(`[useKeyboardNavigation] navigated: direction=${action}, newIndex=${newIndex}, shouldUpdate=${shouldUpdate}`);
         break;
-      case 'navigateRight':
-        // 处理网格布局的右导航；非 grid 转发给 onNavigate 以支持自定义行为
-        if (elementType === 'grid') {
-          const itemsPerRow = cols;
-          // 修改为跨行移动：在行尾时移动到下一行开头
-          if (selectedIndex % itemsPerRow < itemsPerRow - 1) {
-            newIndex = selectedIndex + 1;
-          } else {
-            // 在行尾时移动到下一行开头
-            newIndex = selectedIndex + 1;
-          }
-          // Clamp 至合法范围，避免落到不存在的位置（例如最后一项后面）
-          if (newIndex >= totalItems) newIndex = totalItems - 1;
-          onNavigate?.('right', newIndex);
-        } else {
-          onNavigate?.('right', selectedIndex);
-        }
-        break;
+      }
       case 'select':
         onSelect?.(selectedIndex);
         return true;
@@ -191,45 +195,19 @@ export const useKeyboardNavigation = ({
         onBack?.();
         return true;
       case 'menu':
-        onEscape?.()
+        onEscape?.();
         return true;
+      default:
+        return false;
     }
     
-    // 更新导航状态
-    if (newIndex !== selectedIndex) {
-      // 对于TextList等非Grid元素，上下导航总是可用（支持循环）
-      let canNavigateUp = true;
-      let canNavigateDown = true;
-      const canNavigateLeft = true;
-      const canNavigateRight = true;
-      
-      // Grid元素的导航状态更新
-      if (elementType === 'grid') {
-        const itemsPerRow = cols;
-        const currentRow = Math.floor(newIndex / itemsPerRow);
-        const totalRows = Math.ceil(totalItems / itemsPerRow);
-        const currentCol = newIndex % itemsPerRow;
-        
-        canNavigateUp = currentRow > 0;
-        canNavigateDown = currentRow < totalRows - 1;
-        // 左右导航在Grid中总是可用，因为我们实现了跨行移动
-      }
-      
-      updateNavigation({
-        selectedIndex: newIndex,
-        canNavigate: {
-          up: canNavigateUp,
-          down: canNavigateDown,
-          left: canNavigateLeft,
-          right: canNavigateRight,
-          select: true,
-          back: true
-        }
-      });
+    if (shouldUpdate) {
+      console.log(`[useKeyboardNavigation] 更新状态: selectedIndex=${selectedIndex} -> ${newIndex}`);
+      updateNavigationState(newIndex);
     }
     
     return true;
-  }, [focusedElement, elementId, selectedIndex, totalItems, gridColumns, elementType, onNavigate, onSelect, onBack, onEscape, updateNavigation]);
+  }, [elementId, selectedIndex, totalItems, cols, isGrid, onNavigate, onSelect, onBack, onEscape, updateNavigationState]);
   
   // 注册键盘事件监听器
   useEffect(() => {
@@ -244,19 +222,17 @@ export const useKeyboardNavigation = ({
     };
   }, [handleKeyboardAction, isEnabled]);
   
-  // 启动键盘监听
+  // 启动键盘监听（仅在应用首次加载时启动一次，之后不再停止）
   useEffect(() => {
     keyboardManager.startListening();
-    
-    return () => {
-      keyboardManager.stopListening();
-    };
+    // 不在cleanup中调用stopListening()，避免完全停止监听
+    // stopListening会导致其他页面无法响应键盘和手柄
   }, []);
   
   return {
     selectedIndex,
     setSelectedIndex: (index: number) => {
-      updateNavigation({ selectedIndex: index });
+      updateNavigationState(index);
     },
     isFocused: focusedElement?.id === elementId
   };

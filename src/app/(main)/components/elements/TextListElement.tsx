@@ -12,6 +12,7 @@ interface TextListElementProps {
   selectedIndex?: number;
   onItemSelect?: (index: number) => void;
   onBack?: () => void;
+  onEscape?: () => void;
   fontPath?: string;
   themeName?: string;
   view?: 'system' | 'gamelist' | 'menu';
@@ -25,6 +26,7 @@ export default function TextListElement({
   selectedIndex: externalSelectedIndex = 0,
   onItemSelect,
   onBack,
+  onEscape,
   view = 'system'
 }: TextListElementProps) {
   const defaults = getElementDefaultProps('textlist');
@@ -33,7 +35,10 @@ export default function TextListElement({
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<HTMLDivElement[]>([]);
   
+  // 如果没有传入 onEscape，从 store 中获取
   const { openThemeSelector } = useModalStore();
+  const escapeHandler = onEscape || openThemeSelector;
+  
   // 使用键盘导航钩子
   const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
     elementId: `textlist-${element.name || 'default'}`,
@@ -41,7 +46,7 @@ export default function TextListElement({
     totalItems: items.length,
     initialIndex: externalSelectedIndex,
     onSelect: onItemSelect,
-    onEscape: openThemeSelector,
+    onEscape: escapeHandler,
     onBack: onBack,
     onNavigate: (direction, index) => {
       console.log(`TextList navigated ${direction} to index ${index}`);

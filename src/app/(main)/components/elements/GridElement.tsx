@@ -15,6 +15,7 @@ interface GridElementProps {
   selectedIndex?: number;
   onItemSelect?: (index: number) => void;
   onBack?: () => void;
+  onEscape?: () => void;
   view?: 'system' | 'gamelist' | 'menu';
 }
 
@@ -53,12 +54,15 @@ export default function GridElement({
   selectedIndex: externalSelectedIndex = 0,
   onItemSelect,
   onBack,
+  onEscape,
   view = 'system',
 }: GridElementProps) {
   const defaults = getElementDefaultProps('grid');
   const props = { ...defaults, ...element.properties };
 
+  // 如果没有传入 onEscape，从 store 中获取
   const { openThemeSelector } = useModalStore();
+  const escapeHandler = onEscape || openThemeSelector;
 
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
@@ -141,7 +145,7 @@ export default function GridElement({
     initialIndex: externalSelectedIndex,
     gridColumns: itemsPerRow,
     onSelect: onItemSelect,
-    onEscape: openThemeSelector,
+    onEscape: escapeHandler,
     onBack: onBack,
     onNavigate: (direction, index) => {
       console.log(`Grid navigated ${direction} to index ${index}`);

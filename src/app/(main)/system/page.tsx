@@ -6,6 +6,7 @@ import { getViewElements } from '@/app/utils/themeUtils';
 import ElementRenderer from '../components/ElementRenderer';
 import { useModalStore } from '../store/modal';
 import { useThemeStore } from '../store/theme'; // Import useThemeStore
+import { focusManager } from '../focusManager';
 import metadata from '../../metadata.json';
 import DebugInfoOverlay from '../components/common/DebugInfoOverlay';
 
@@ -13,9 +14,10 @@ export default function SystemPage() {
   const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio, themeName } = useTheme(); // Get selectedVariant and selectedColorScheme
   const { setView, selectedSystem, setSelectedSystem, systems } = useThemeStore(); // Get setView function
   
-  // Set view to 'system' when component mounts
+  // Set view to 'system' when component mounts and clear focus stack
   useEffect(() => {
     setView('system');
+    focusManager.clearFocusStack();
   }, [setView]);
 
   const systemItems = Object.keys(systems)
@@ -74,6 +76,7 @@ export default function SystemPage() {
             selectedIndex={isList ? selectedIndex : undefined}
             onItemSelect={isList ? handleSystemSelect : undefined}
             onBack={handleBack}
+            onEscape={openThemeSelector}
             view="system"
           />
         );

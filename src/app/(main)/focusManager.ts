@@ -31,8 +31,25 @@ export class FocusManager {
     
     this.elements.delete(elementId);
     
-    // 如果删除的是当前聚焦元素，聚焦到下一个
+    // 从焦点堆栈中移除这个元素
+    const stackIndex = this.focusStack.indexOf(elementId);
+    if (stackIndex > -1) {
+      this.focusStack.splice(stackIndex, 1);
+    }
+    
+    // 如果删除的是当前聚焦元素，聚焦到下一个或堆栈中的上一个
     if (wasFocused) {
+      // 优先尝试从堆栈中恢复
+      if (this.focusStack.length > 0) {
+        const previousId = this.focusStack[this.focusStack.length - 1];
+        const previousElement = this.elements.get(previousId);
+        if (previousElement) {
+          useKeyboardStore.getState().setFocusedElement(previousElement);
+          return;
+        }
+      }
+      
+      // 否则聚焦到下一个可用元素
       const nextElement = this.getNextFocusableElement();
       if (nextElement) {
         this.focusElement(nextElement.id);
@@ -45,7 +62,12 @@ export class FocusManager {
   // 聚焦特定元素
   focusElement(elementId: string): void {
     const element = this.elements.get(elementId);
-    if (!element) return;
+    if (!element) {
+      console.log(`[focusManager] focusElement: element ${elementId} not found`);
+      return;
+    }
+    
+    console.log(`[focusManager] focusElement: ${elementId}, stack before=${JSON.stringify(this.focusStack)}`);
     
     // 更新聚焦状态
     useKeyboardStore.getState().setFocusedElement(element);
@@ -56,6 +78,8 @@ export class FocusManager {
       this.focusStack.splice(index, 1);
     }
     this.focusStack.push(elementId);
+    
+    console.log(`[focusManager] focusElement: ${elementId}, stack after=${JSON.stringify(this.focusStack)}`);
     
     // 触发焦点变化事件
     this.notifyFocusChange(element);
@@ -80,6 +104,48 @@ export class FocusManager {
     const previousElement = this.getPreviousFocusableElement();
     if (previousElement) {
       this.focusElement(previousElement.id);
+    }
+  }
+  
+  // 从焦点堆栈中弹出并恢复上一个焦点
+  popFocus(): void {
+    console.log(`[focusManager] popFocus: current stack=${JSON.stringify(this.focusStack)}`);
+    console.trace('[focusManager] popFocus call stack');
+    if (this.focusStack.length <= 1) {
+      console.log(`[focusManager] popFocus: stack too small, ignoring`);
+      return;
+    }
+    
+    // 移除当前焦点
+    this.focusStack.pop();
+    console.log(`[focusManager] popFocus: after pop, stack=${JSON.stringify(this.focusStack)}`);
+    
+    // 尝试从堆栈中恢复上一个有效的焦点
+    while (this.focusStack.length > 0) {
+      const previousId = this.focusStack[this.focusStack.length - 1];
+      const previousElement = this.elements.get(previousId);
+      
+      console.log(`[focusManager] popFocus: trying to restore ${previousId}, exists=${!!previousElement}`);
+      
+      if (previousElement) {
+        useKeyboardStore.getState().setFocusedElement(previousElement);
+        this.notifyFocusChange(previousElement);
+        console.log(`[focusManager] popFocus: restored ${previousId}`);
+        return;
+      }
+      
+      // 如果元素不存在，从堆栈中移除并继续
+      this.focusStack.pop();
+    }
+    
+    // 如果堆栈为空，尝试聚焦任何可用元素
+    const firstElement = this.getNextFocusableElement();
+    if (firstElement) {
+      console.log(`[focusManager] popFocus: stack empty, focusing first available: ${firstElement.id}`);
+      this.focusElement(firstElement.id);
+    } else {
+      console.log(`[focusManager] popFocus: no elements available`);
+      useKeyboardStore.getState().setFocusedElement(null);
     }
   }
   
@@ -123,6 +189,13 @@ export class FocusManager {
   private notifyFocusChange(element: ElementNavigation): void {
     // 可以在这里触发自定义事件或回调
     console.log(`Focus changed to element: ${element.id} (${element.type}) stack:`, this.focusStack);
+  }
+  
+  // 清空焦点堆栈（页面切换时使用）
+  clearFocusStack(): void {
+    console.log(`[focusManager] clearFocusStack: old stack=${JSON.stringify(this.focusStack)}`);
+    this.focusStack = [];
+    console.log(`[focusManager] Focus stack cleared`);
   }
   
   // 更新元素导航信息

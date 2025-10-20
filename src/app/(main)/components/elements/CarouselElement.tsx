@@ -15,6 +15,7 @@ interface CarouselElementProps {
   selectedIndex?: number;
   onItemSelect?: (index: number) => void;
   onBack?: () => void;
+  onEscape?: () => void;
   view?: 'system' | 'gamelist' | 'menu';
 }
 
@@ -53,12 +54,16 @@ export default function CarouselElement({
   selectedIndex: externalSelectedIndex = 0,
   onItemSelect,
   onBack,
+  onEscape,
   view = 'system',
 }: CarouselElementProps) {
   const defaults = getElementDefaultProps('carousel');
   const props = { ...defaults, ...element.properties };
   
+  // 如果没有传入 onEscape，从 store 中获取
   const { openThemeSelector } = useModalStore();
+  const escapeHandler = onEscape || openThemeSelector;
+  
   // 使用键盘导航钩子
   const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
     elementId: `carousel-${element.name || 'default'}`,
@@ -67,7 +72,7 @@ export default function CarouselElement({
     initialIndex: externalSelectedIndex,
     onSelect: onItemSelect,
     onBack: onBack,
-    onEscape: openThemeSelector,
+    onEscape: escapeHandler,
     onNavigate: (direction, index) => {
       console.log(`Carousel navigated ${direction} to index ${index}`);
     }

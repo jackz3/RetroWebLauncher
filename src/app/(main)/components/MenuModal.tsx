@@ -98,6 +98,7 @@ const MenuModal = () => {
 
   // Refs
   const previousViewRef = useRef<'system' | 'gamelist'>('system');
+  const focusRestoredRef = useRef<boolean>(false);
   const menuStateRef = useRef(menuState);
   const previousMenuLengthRef = useRef(menuState.current.length);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null); // Ref for scroll container
@@ -170,7 +171,7 @@ const MenuModal = () => {
         return { ...item, label: sourceValue === 'onedrive' ? 'SOURCE ONEDRIVE' : 'SOURCE VFS' };
       }
       if (item.id === 'onedrive') {
-        return { ...item, label: odUsername ? `ONEDRIVE (${odUsername})` : 'CONNECT ONEDRIVE' };
+        return { ...item, label: odUsername ? `ONEDRIVE (${odUsername})` : 'SET ONEDRIVE ROOT' };
       }
       return { ...item };
     });
@@ -308,6 +309,7 @@ const MenuModal = () => {
       ? (odEntries.length + (odPath !== '/' ? 1 : 0))
       : (menuState.systemList ? menuState.systemList.length : menuState.current.length),
     initialIndex: 0,
+    isEnabled: isThemeSelectorOpen,
     resetDeps: [
       menuState.title,
       menuState.systemList ? menuState.systemList.length : -1,
@@ -464,8 +466,7 @@ const MenuModal = () => {
           }
         } catch {}
       }
-    },
-    isEnabled: isThemeSelectorOpen // Pass the modal open state to the hook
+    }
   });
 
   useEffect(() => {
@@ -793,6 +794,8 @@ const MenuModal = () => {
   // Effects
   useEffect(() => {
     if (isThemeSelectorOpen) {
+      // Reset focus restoration flag when modal opens
+      focusRestoredRef.current = false;
       // Initialize temp states with current selected values when modal opens
       setTempTheme(themeName);
       setTempVariant(selectedVariant);
@@ -821,6 +824,7 @@ const MenuModal = () => {
       focusManager.focusElement('menu-modal');
       // 异步检查 OneDrive 登录状态并刷新菜单标题
       (async () => {
+        if (initialSource === 'vfs') return;
         try {
           await oneDrive.init();
           if (oneDrive.isSignedIn()) {
@@ -842,7 +846,14 @@ const MenuModal = () => {
         console.log('MenuModal closing: restoring view to', previousViewRef.current);
         setView(previousViewRef.current);
       }
-      // focusManager.clearFocusedElement();
+      // 从焦点堆栈中恢复上一个焦点 - 仅调用一次
+      if (!focusRestoredRef.current) {
+        focusRestoredRef.current = true;
+        console.log('[MenuModal] Calling popFocus to restore focus');
+        focusManager.popFocus();
+      } else {
+        console.log('[MenuModal] Focus already restored, skipping popFocus');
+      }
     }
   }, [
     isThemeSelectorOpen,
