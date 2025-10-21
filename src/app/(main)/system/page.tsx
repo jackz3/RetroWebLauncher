@@ -1,20 +1,27 @@
 'use client';
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTheme } from '../ThemeProvider';
-import { getViewElements } from '@/app/utils/themeUtils';
 import ElementRenderer from '../components/ElementRenderer';
 import { useModalStore } from '../store/modal';
 import { useThemeStore } from '../store/theme';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { useViewNavigationConfig } from '../hooks/useViewNavigationConfig';
 import metadata from '../../metadata.json';
 import DebugInfoOverlay from '../components/common/DebugInfoOverlay';
 
 export default function SystemPage() {
-  const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio, themeName } = useTheme();
   const { setView, selectedSystem, setSelectedSystem, systems } = useThemeStore();
-  const { openThemeSelector } = useModalStore();
+  const { openThemeSelector, isThemeSelectorOpen } = useModalStore();
   const router = useRouter();
+  const {
+    isThemeReady,
+    themeJson,
+    themeName,
+    elements: systemElements,
+    mergedThemeVariables,
+    navigationElementType,
+    navigationGridColumns
+  } = useViewNavigationConfig('system');
   
   // 初始化视图
   useEffect(() => {
@@ -46,10 +53,11 @@ export default function SystemPage() {
 
   // ✅ 键盘导航 Hook
   const { selectedIndex } = useKeyboardNavigation({
-    elementType: 'textlist',
+    elementType: navigationElementType,
     totalItems: systemItems.length,
     initialIndex: initialIndex,
-    isEnabled: true,
+    gridColumns: navigationGridColumns,
+    isEnabled: !isThemeSelectorOpen && systemItems.length > 0,
     onSelect: (index) => {
       const system = systemItems[index].system;
       setSelectedSystem(system);
@@ -61,17 +69,9 @@ export default function SystemPage() {
     onEscape: openThemeSelector
   });
 
-  if (!themeJson || !selectedVariant || !selectedAspectRatio) {
+  if (!isThemeReady) {
     return <div>Loading...</div>;
   }
-
-  const { elements: systemElements, variables: mergedThemeVariables } = getViewElements(
-    themeJson,
-    'system',
-    selectedVariant,
-    selectedAspectRatio,
-    selectedColorScheme
-  );
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -93,7 +93,7 @@ export default function SystemPage() {
       })}
       
       <DebugInfoOverlay
-        themeName={themeJson.name}
+        themeName={themeJson?.name ?? themeName ?? 'Unknown Theme'}
         elementsCount={systemElements.length}
         selectedLabel={systemItems[selectedIndex]?.system || 'N/A'}
       />

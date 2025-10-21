@@ -1,23 +1,32 @@
 'use client';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useTheme } from '../../ThemeProvider';
-import { getViewElements } from '@/app/utils/themeUtils';
 import ElementRenderer from '../../components/ElementRenderer';
 import { useThemeStore } from '../../store/theme';
 import { useModalStore } from '../../store/modal';
 import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
+import { useViewNavigationConfig } from '../../hooks/useViewNavigationConfig';
 import { browserFS } from '@/app/utils/fs';
 import { oneDrive } from '@/app/utils/onedrive';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
 
+const STORAGE_KEY_PREFIX = 'gamelist:selectedIndex:';
+
 export default function GameListContent() {
-  const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio } = useTheme();
   const { setView, gameListRefreshKey } = useThemeStore();
-  const { openThemeSelector } = useModalStore();
+  const { openThemeSelector, isThemeSelectorOpen } = useModalStore();
   const router = useRouter();
   const params = useParams<{ system?: string }>();
   const selectedSystem = typeof params?.system === 'string' ? params.system : undefined;
+  const {
+    isThemeReady,
+    themeJson,
+    themeName,
+    elements: gamelistElements,
+    mergedThemeVariables,
+    navigationElementType,
+    navigationGridColumns
+  } = useViewNavigationConfig('gamelist');
 
   const [gameFiles, setGameFiles] = useState<string[]>([]);
   const [screenshotFiles, setScreenshotFiles] = useState<string[]>([]);
@@ -150,12 +159,27 @@ export default function GameListContent() {
     });
   }, [gameFiles, screenshotFiles, selectedSystem]);
 
+  const storageKey = useMemo(() => {
+    if (!selectedSystem) return '';
+    return `${STORAGE_KEY_PREFIX}${selectedSystem}`;
+  }, [selectedSystem]);
+
+  const initialIndex = useMemo(() => {
+    if (!storageKey || typeof window === 'undefined') return 0;
+    const raw = sessionStorage.getItem(storageKey);
+    const parsed = raw ? Number.parseInt(raw, 10) : 0;
+    if (!Number.isFinite(parsed) || parsed < 0) return 0;
+    if (!gameList.length) return parsed;
+    return Math.min(parsed, gameList.length - 1);
+  }, [storageKey, gameList.length]);
+
   // ✅ 键盘导航 Hook
   const { selectedIndex } = useKeyboardNavigation({
-    elementType: 'textlist',
+    elementType: navigationElementType,
     totalItems: gameList.length,
-    initialIndex: 0,
-    isEnabled: !loading,
+    initialIndex,
+    gridColumns: navigationGridColumns,
+    isEnabled: !isThemeSelectorOpen && !loading && gameList.length > 0,
     onSelect: (index) => {
       const selectedGame = gameList[index];
       console.log('Selected Game:', selectedGame);
@@ -167,17 +191,14 @@ export default function GameListContent() {
     onEscape: openThemeSelector
   });
 
-  if (!themeJson || !selectedVariant || !selectedAspectRatio) {
+  useEffect(() => {
+    if (!storageKey || typeof window === 'undefined') return;
+    sessionStorage.setItem(storageKey, String(selectedIndex));
+  }, [selectedIndex, storageKey]);
+
+  if (!isThemeReady) {
     return <div>Loading...</div>;
   }
-  
-  const { elements: gamelistElements, variables: mergedThemeVariables } = getViewElements(
-    themeJson,
-    'gamelist',
-    selectedVariant,
-    selectedAspectRatio,
-    selectedColorScheme
-  );
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -196,7 +217,7 @@ export default function GameListContent() {
             key={element.name}
             element={element}
             themeVariables={mergedThemeVariables}
-            themeName={themeJson.name}
+            themeName={themeName ?? themeJson?.name ?? 'Unknown Theme'}
             items={gameList}
             item={element.type === 'text' ? selectedGame : undefined}
             selectedIndex={isList ? selectedIndex : undefined}

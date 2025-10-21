@@ -1093,7 +1093,7 @@ const MenuModal = () => {
                 isPendingFile={(file) => !!(localSelectedSystem && isGamePending({ systemId: localSelectedSystem, fileName: file }))}
               />
             ) : (
-              <div ref={scrollContainerRef} className="border border-gray-200 rounded-md max-h-[calc(60vh-200px)] overflow-y-auto">
+              <div ref={scrollContainerRef} className="border border-gray-200 rounded-md max-h-[calc(70vh-60px)] overflow-y-auto">
                 <ul className="overflow-hidden">
                   {menuState.current.map((item, index) => (
                     <li key={item.id} data-index={index}>
