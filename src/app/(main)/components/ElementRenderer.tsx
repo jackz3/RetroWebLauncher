@@ -17,9 +17,6 @@ interface ElementRendererProps {
   items?: Array<{ name: string; [key: string]: any }>;
   item?: { name: string; [key: string]: any };
   selectedIndex?: number;
-  onItemSelect?: (index: number) => void;
-  onBack?: () => void;
-  onEscape?: () => void;
   view: 'system' | 'gamelist' | 'menu';
 }
 
@@ -30,9 +27,6 @@ export default function ElementRenderer({
   selectedIndex = 0,
   items = [],
   item = undefined,
-  onItemSelect,
-  onBack,
-  onEscape,
   view,
 }: ElementRendererProps) {
   const { type } = element;
@@ -83,9 +77,6 @@ export default function ElementRenderer({
           themeName={themeName}
           items={items}
           selectedIndex={selectedIndex}
-          onItemSelect={onItemSelect}
-          onBack={onBack}
-          onEscape={onEscape}
           view={view}
         />
       );
@@ -95,12 +86,10 @@ export default function ElementRenderer({
         <TextListElement
           element={processedElement}
           themeVariables={themeVariables}
+          themeName={themeName}
           items={items}
           selectedIndex={selectedIndex}
-          onItemSelect={onItemSelect}
-          onBack={onBack}
-          onEscape={onEscape}
-          themeName={themeName}
+          view={view}
         />
       );
     
@@ -112,9 +101,6 @@ export default function ElementRenderer({
           themeName={themeName}
           items={items}
           selectedIndex={selectedIndex}
-          onItemSelect={onItemSelect}
-          onBack={onBack}
-          onEscape={onEscape}
           view={view}
         />
       );

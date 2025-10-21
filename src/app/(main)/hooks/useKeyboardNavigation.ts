@@ -1,11 +1,7 @@
 import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
-import { useKeyboardStore, ElementNavigation } from '../store/keyboard';
 import { keyboardManager, KeyboardAction } from '../keyboardManager';
-import { focusManager } from '../focusManager';
 
 interface UseKeyboardNavigationOptions {
-  key?: any;
-  elementId: string;
   elementType: 'textlist' | 'carousel' | 'grid' | 'menu' | 'play';
   totalItems: number;
   initialIndex?: number;
@@ -74,13 +70,11 @@ const gridNavigationUtils = {
 };
 
 export const useKeyboardNavigation = ({
-  key,
-  elementId,
   elementType,
   totalItems,
   initialIndex = 0,
   gridColumns,
-  resetDeps,
+  resetDeps = [],
   resetToIndex,
   onSelect,
   onEscape,
@@ -88,152 +82,134 @@ export const useKeyboardNavigation = ({
   onNavigate,
   isEnabled = true
 }: UseKeyboardNavigationOptions) => {
-  const { focusedElement } = useKeyboardStore();
-  
-  // 使用本地状态管理选中索引，避免依赖全局 focusedElement
+  // ✅ 使用本地状态管理选中索引，完全移除焦点管理器依赖
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+  const handlerRef = useRef<((action: KeyboardAction, event: KeyboardEvent) => boolean) | null>(null);
   
+  // 计算网格列数
   const cols = useMemo(() => {
     if (gridColumns) return gridColumns;
-    const defaultCols = Math.floor(Math.sqrt(totalItems)) || 1;
-    return Math.max(1, defaultCols);
-  }, [gridColumns, totalItems]);
+    if (elementType !== 'grid') return 1;
+    
+    // 根据 totalItems 智能计算列数
+    if (totalItems <= 4) return Math.ceil(Math.sqrt(totalItems));
+    if (totalItems <= 9) return 3;
+    return 4;
+  }, [gridColumns, totalItems, elementType]);
+  
   const isGrid = elementType === 'grid';
   
-    // 注册元素
+  // ✅ 重置选中索引
   useEffect(() => {
-    return () => {
-      focusManager.unregisterElement(elementId);
-    };
-  }, [elementId]);
-  
-  // 初始化时注册元素（仅依赖于 elementId）
-  useEffect(() => {
-    if (!isEnabled) return;
-    
-    const elementNavigation: ElementNavigation = {
-      id: elementId,
-      type: elementType,
-      totalItems,
-      selectedIndex,
-      canNavigate: {
-        up: true, down: true, left: true, right: true, select: true, back: true
-      }
-    };
-    
-    focusManager.registerElement(elementNavigation);
-  }, [elementId, elementType, totalItems, isEnabled]);
-  
-  // 当 selectedIndex 变化时，更新焦点元素的信息
-  useEffect(() => {
-    if (!isEnabled) return;
-    focusManager.updateElementNavigation(elementId, { selectedIndex });
-  }, [elementId, selectedIndex, isEnabled]);
-
-  // 依赖变化时重置选中索引
-  useEffect(() => {
-    if (!isEnabled) return;
     if (typeof resetToIndex === 'number') {
       setSelectedIndex(resetToIndex);
     } else {
       setSelectedIndex(initialIndex);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEnabled, initialIndex, resetToIndex, ...(Array.isArray(resetDeps) ? resetDeps : [])]);
+  }, [initialIndex, resetToIndex, ...(Array.isArray(resetDeps) ? resetDeps : [])]);
   
-  // 更新导航状态
-  const updateNavigationState = useCallback((newIndex: number) => {
-    setSelectedIndex(newIndex);
-  }, []);
-
-  // 键盘事件处理器（使用 ref 获取最新的焦点元素，避免依赖变化导致频繁重新创建）
-  const focusedElementRef = useRef<ElementNavigation | null>(null);
-  
-  useEffect(() => {
-    focusedElementRef.current = focusedElement;
-  }, [focusedElement]);
-
-  const handleKeyboardAction = useCallback((action: KeyboardAction, event: KeyboardEvent): boolean => {
-    // 使用 ref 检查焦点，而不是依赖
-    if (focusedElementRef.current?.id !== elementId) {
-      console.log(`[useKeyboardNavigation] 焦点不匹配: focusedElement=${focusedElementRef.current?.id}, elementId=${elementId}`);
-      return false;
-    }
-    
-    console.log(`[useKeyboardNavigation] 处理 action=${action}, elementId=${elementId}, selectedIndex=${selectedIndex}`);
-    
+  // ✅ 处理导航逻辑
+  const handleNavigation = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
     let newIndex = selectedIndex;
-    let shouldUpdate = false;
     
-    switch (action) {
-      case 'navigateUp':
-      case 'navigateDown':
-      case 'navigateLeft':
-      case 'navigateRight': {
-        if (isGrid) {
-          newIndex = gridNavigationUtils.getNewIndex(selectedIndex, action.replace('navigate', '').toLowerCase() as any, cols, totalItems);
-        } else {
-          // 非Grid元素支持循环
-          const directions: Record<string, number> = {
-            navigateUp: -1,
-            navigateDown: 1,
-            navigateLeft: -1,
-            navigateRight: 1
-          };
-          const step = directions[action] || 0;
-          newIndex = (selectedIndex + step + totalItems) % totalItems;
-        }
-        shouldUpdate = newIndex !== selectedIndex;
-        onNavigate?.(action.replace('navigate', '').toLowerCase() as any, newIndex);
-        console.log(`[useKeyboardNavigation] navigated: direction=${action}, newIndex=${newIndex}, shouldUpdate=${shouldUpdate}`);
-        break;
-      }
-      case 'select':
-        onSelect?.(selectedIndex);
-        return true;
-      case 'back':
-        onBack?.();
-        return true;
-      case 'menu':
-        onEscape?.();
-        return true;
-      default:
-        return false;
-    }
-    
-    if (shouldUpdate) {
-      console.log(`[useKeyboardNavigation] 更新状态: selectedIndex=${selectedIndex} -> ${newIndex}`);
-      updateNavigationState(newIndex);
-    }
-    
-    return true;
-  }, [elementId, selectedIndex, totalItems, cols, isGrid, onNavigate, onSelect, onBack, onEscape, updateNavigationState]);
-  
-  // 注册键盘事件监听器
-  useEffect(() => {
-    if (isEnabled) {
-      keyboardManager.addEventListener(handleKeyboardAction);
+    if (isGrid) {
+      newIndex = gridNavigationUtils.getNewIndex(selectedIndex, direction, cols, totalItems);
     } else {
-      keyboardManager.removeEventListener(handleKeyboardAction);
+      // TextList / Carousel：支持循环导航
+      switch (direction) {
+        case 'up':
+        case 'left':
+          newIndex = (selectedIndex - 1 + totalItems) % totalItems;
+          break;
+        case 'down':
+        case 'right':
+          newIndex = (selectedIndex + 1) % totalItems;
+          break;
+      }
     }
+    
+    if (newIndex !== selectedIndex) {
+      setSelectedIndex(newIndex);
+      onNavigate?.(direction, newIndex);
+    }
+  }, [selectedIndex, totalItems, cols, isGrid, onNavigate]);
+  
+  // ✅ 创建键盘事件处理器
+  useEffect(() => {
+    if (!isEnabled || totalItems === 0) {
+      if (handlerRef.current) {
+        keyboardManager.removeEventListener(handlerRef.current);
+        handlerRef.current = null;
+      }
+      return;
+    }
+    
+    const handler = (action: KeyboardAction, event: KeyboardEvent): boolean => {
+      if (!isEnabled) return false;
+      
+      switch (action) {
+        case 'navigateUp':
+          event.preventDefault();
+          handleNavigation('up');
+          return true;
+        
+        case 'navigateDown':
+          event.preventDefault();
+          handleNavigation('down');
+          return true;
+        
+        case 'navigateLeft':
+          event.preventDefault();
+          handleNavigation('left');
+          return true;
+        
+        case 'navigateRight':
+          event.preventDefault();
+          handleNavigation('right');
+          return true;
+        
+        case 'select':
+          event.preventDefault();
+          onSelect?.(selectedIndex);
+          return true;
+        
+        case 'back':
+          event.preventDefault();
+          onBack?.();
+          return true;
+        
+        case 'menu':
+        case 'action':
+          event.preventDefault();
+          onEscape?.();
+          return true;
+        
+        default:
+          return false;
+      }
+    };
+    
+    handlerRef.current = handler;
+    keyboardManager.addEventListener(handler);
     
     return () => {
-      keyboardManager.removeEventListener(handleKeyboardAction);
+      if (handlerRef.current) {
+        keyboardManager.removeEventListener(handlerRef.current);
+        handlerRef.current = null;
+      }
     };
-  }, [handleKeyboardAction, isEnabled]);
+  }, [isEnabled, totalItems, selectedIndex, handleNavigation, onSelect, onBack, onEscape]);
   
-  // 启动键盘监听（仅在应用首次加载时启动一次，之后不再停止）
+  // ✅ 启动键盘监听（仅在应用首次加载时启动一次）
   useEffect(() => {
     keyboardManager.startListening();
     // 不在cleanup中调用stopListening()，避免完全停止监听
-    // stopListening会导致其他页面无法响应键盘和手柄
   }, []);
   
   return {
     selectedIndex,
-    setSelectedIndex: (index: number) => {
-      updateNavigationState(index);
-    },
-    isFocused: focusedElement?.id === elementId
+    setSelectedIndex,
+    isFocused: isEnabled
   };
 };

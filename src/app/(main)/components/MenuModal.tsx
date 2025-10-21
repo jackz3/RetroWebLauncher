@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useThemeStore } from '../store/theme';
 import { useModalStore } from '../store/modal';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
-import { focusManager } from '../focusManager';
 import { getAllSystems, getSelectedSystems, toggleSystemSelection, saveSelectedSystems } from '@/app/utils/systemManager';
 import { browserFS } from '@/app/utils/fs';
 import { oneDrive } from '@/app/utils/onedrive';
@@ -301,7 +300,6 @@ const MenuModal = () => {
 
   // Keyboard navigation
   const { selectedIndex, setSelectedIndex } = useKeyboardNavigation({
-    elementId: 'menu-modal',
     elementType: 'menu',
     totalItems: menuState.title.startsWith('VFS:')
       ? (vfsEntries.length + (vfsPath !== '/' ? 1 : 0))
@@ -821,7 +819,7 @@ const MenuModal = () => {
       const updatedMenu = buildRootMenu(initialSource);
       dispatchMenu({ type: 'RESET', current: updatedMenu, title: 'MAIN MENU' });
       setView('menu'); // Set view to 'menu' when modal opens
-      focusManager.focusElement('menu-modal');
+      // ✅ 移除 focusManager.focusElement - 通过 useKeyboardNavigation 的 isEnabled 控制
       // 异步检查 OneDrive 登录状态并刷新菜单标题
       (async () => {
         if (initialSource === 'vfs') return;
@@ -846,13 +844,12 @@ const MenuModal = () => {
         console.log('MenuModal closing: restoring view to', previousViewRef.current);
         setView(previousViewRef.current);
       }
-      // 从焦点堆栈中恢复上一个焦点 - 仅调用一次
+      // ✅ 移除 focusManager.popFocus - 焦点恢复由页面组件的 useKeyboardNavigation 处理
       if (!focusRestoredRef.current) {
         focusRestoredRef.current = true;
-        console.log('[MenuModal] Calling popFocus to restore focus');
-        focusManager.popFocus();
+        console.log('[MenuModal] Menu closed, focus will be restored by page component');
       } else {
-        console.log('[MenuModal] Focus already restored, skipping popFocus');
+        console.log('[MenuModal] Menu already closed');
       }
     }
   }, [
@@ -999,7 +996,7 @@ const MenuModal = () => {
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
-      <div className="bg-white rounded-lg p-4 w-1/2 max-w-[60vw] h-[60vh] flex flex-col">
+      <div className="bg-white rounded-lg p-4 w-1/2 max-w-[60vw] h-[70vh] flex flex-col">
         <input
           ref={vfsUploadInputRef}
           type="file"

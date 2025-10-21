@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getElementDefaultProps } from '@/app/utils/themeUtils';
 import { useFontLoader } from '../../hooks/useFontLoader';
-import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
-import { useModalStore } from '@/app/(main)/store/modal';
 import FsImage from '@/app/(main)/components/common/FsImage';
 
 interface GridElementProps {
@@ -13,9 +11,6 @@ interface GridElementProps {
   themeName?: string;
   items?: Array<{ name: string; image?: string; system?: string; screenshot?: boolean;[key: string]: any }>;
   selectedIndex?: number;
-  onItemSelect?: (index: number) => void;
-  onBack?: () => void;
-  onEscape?: () => void;
   view?: 'system' | 'gamelist' | 'menu';
 }
 
@@ -52,17 +47,13 @@ export default function GridElement({
   themeName = '',
   items = [],
   selectedIndex: externalSelectedIndex = 0,
-  onItemSelect,
-  onBack,
-  onEscape,
   view = 'system',
 }: GridElementProps) {
   const defaults = getElementDefaultProps('grid');
   const props = { ...defaults, ...element.properties };
 
-  // 如果没有传入 onEscape，从 store 中获取
-  const { openThemeSelector } = useModalStore();
-  const escapeHandler = onEscape || openThemeSelector;
+  // ✅ 移除 useKeyboardNavigation Hook 调用
+  // ✅ 仅处理自己作为 UI 的职责
 
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
@@ -137,29 +128,17 @@ export default function GridElement({
   const itemsPerColumn = Math.floor(containerHeight / effectiveItemHeight) || 1;
   const maxItems = itemsPerRow * itemsPerColumn;
 
-  // 使用键盘导航钩子（在计算出 itemsPerRow 之后传入 gridColumns）
-  const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
-    elementId: `grid-${element.name || 'default'}`,
-    elementType: 'grid',
-    totalItems: items.length,
-    initialIndex: externalSelectedIndex,
-    gridColumns: itemsPerRow,
-    onSelect: onItemSelect,
-    onEscape: escapeHandler,
-    onBack: onBack,
-    onNavigate: (direction, index) => {
-      console.log(`Grid navigated ${direction} to index ${index}`);
-    }
-  });
+  // ✅ 移除 useKeyboardNavigation Hook 调用
+  // ✅ 只使用传入的 externalSelectedIndex 和 scrollOffset 状态
 
   // 获取当前显示的项目（考虑滚动偏移）
   const displayItems = items.slice(scrollOffset, scrollOffset + maxItems);
 
   // 监听selectedIndex变化，自动滚动到选中项
   useEffect(() => {
-    if (selectedIndex >= 0 && items.length > 0) {
+    if (externalSelectedIndex >= 0 && items.length > 0) {
       // 计算选中项所在的行
-      const selectedRow = Math.floor(selectedIndex / itemsPerRow);
+      const selectedRow = Math.floor(externalSelectedIndex / itemsPerRow);
 
       // 计算当前可见的第一行和最后一行
       const firstVisibleRow = Math.floor(scrollOffset / itemsPerRow);
@@ -184,7 +163,7 @@ export default function GridElement({
         setScrollOffset(newScrollOffset);
       }
     }
-  }, [selectedIndex, items.length, itemsPerRow, itemsPerColumn, scrollOffset, maxItems]);
+  }, [externalSelectedIndex, items.length, itemsPerRow, itemsPerColumn, scrollOffset, maxItems]);
 
   return (
     <div
@@ -203,7 +182,7 @@ export default function GridElement({
       <div className="w-full h-full relative overflow-hidden" ref={containerRef}>
         {displayItems.map((item, displayIndex) => {
           const actualIndex = scrollOffset + displayIndex;
-          const isSelected = actualIndex === selectedIndex;
+          const isSelected = actualIndex === externalSelectedIndex;
           const scale = isSelected ? itemScale : 1;
 
           // 计算网格位置
@@ -230,10 +209,6 @@ export default function GridElement({
                 transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
                 opacity: isSelected ? 1 : unfocusedItemOpacity,
                 filter: isSelected ? 'none' : `saturate(${unfocusedItemSaturation}) brightness(${unfocusedItemDimming})`,
-              }}
-              onClick={() => {
-                setSelectedIndex(actualIndex);
-                onItemSelect?.(actualIndex);
               }}
             >
               {(() => {

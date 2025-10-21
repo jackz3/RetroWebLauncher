@@ -1,53 +1,67 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../ThemeProvider';
 import { getViewElements } from '@/app/utils/themeUtils';
 import ElementRenderer from '../components/ElementRenderer';
 import { useModalStore } from '../store/modal';
-import { useThemeStore } from '../store/theme'; // Import useThemeStore
-import { focusManager } from '../focusManager';
+import { useThemeStore } from '../store/theme';
+import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import metadata from '../../metadata.json';
 import DebugInfoOverlay from '../components/common/DebugInfoOverlay';
 
 export default function SystemPage() {
-  const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio, themeName } = useTheme(); // Get selectedVariant and selectedColorScheme
-  const { setView, selectedSystem, setSelectedSystem, systems } = useThemeStore(); // Get setView function
+  const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio, themeName } = useTheme();
+  const { setView, selectedSystem, setSelectedSystem, systems } = useThemeStore();
+  const { openThemeSelector } = useModalStore();
+  const router = useRouter();
   
-  // Set view to 'system' when component mounts and clear focus stack
+  // 初始化视图
   useEffect(() => {
     setView('system');
-    focusManager.clearFocusStack();
   }, [setView]);
 
-  const systemItems = Object.keys(systems)
-    .map(systemId => {
-      const meta = (metadata as Record<string, any>)[systemId];
-      return {
-        name: meta?.systemName || systemId,
-        description: `${meta?.games?.length ?? 0} games available`,
-        system: systemId
-      };
-    })
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  // ✅ 计算系统列表
+  const systemItems = useMemo(() => {
+    return Object.keys(systems)
+      .map(systemId => {
+        const meta = (metadata as Record<string, any>)[systemId];
+        return {
+          name: meta?.systemName || systemId,
+          description: `${meta?.games?.length ?? 0} games available`,
+          system: systemId
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  }, [systems]);
 
-  const unresolvedIndex = selectedSystem ? systemItems.findIndex(item => item.system === selectedSystem) : 0;
-  const selectedIndex = unresolvedIndex >= 0 ? unresolvedIndex : 0;
-  const router = useRouter(); // Initialize useRouter
+  // ✅ 确定初始选中索引
+  const initialIndex = useMemo(() => {
+    if (selectedSystem) {
+      const index = systemItems.findIndex(item => item.system === selectedSystem);
+      return index >= 0 ? index : 0;
+    }
+    return 0;
+  }, [selectedSystem, systemItems]);
 
-  const handleSystemSelect = (index: number) => {
-    const system = systemItems[index].system;
-    setSelectedSystem(system);
-    router.push(`/gamelist/${system}`); // Navigate to gamelist with system query param
-  };
+  // ✅ 键盘导航 Hook
+  const { selectedIndex } = useKeyboardNavigation({
+    elementType: 'textlist',
+    totalItems: systemItems.length,
+    initialIndex: initialIndex,
+    isEnabled: true,
+    onSelect: (index) => {
+      const system = systemItems[index].system;
+      setSelectedSystem(system);
+      router.push(`/gamelist/${system}`);
+    },
+    onBack: () => {
+      // System 页面没有返回功能
+    },
+    onEscape: openThemeSelector
+  });
 
-  const { openThemeSelector } = useModalStore();
-  
-  const handleBack = () => {
-    // openThemeSelector();
-  };
-
-  if (!themeJson || !selectedVariant || !selectedAspectRatio) { // Add selectedVariant to loading check
+  if (!themeJson || !selectedVariant || !selectedAspectRatio) {
     return <div>Loading...</div>;
   }
 
@@ -58,13 +72,12 @@ export default function SystemPage() {
     selectedAspectRatio,
     selectedColorScheme
   );
-  
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {/* 渲染主题元素 */}
       {systemElements.map((element: any) => {
         const isList = element.type === 'textlist' || element.type === 'carousel' || element.type === 'grid';
+        
         return (
           <ElementRenderer
             key={element.name}
@@ -74,15 +87,11 @@ export default function SystemPage() {
             items={isList ? systemItems : undefined}
             item={element.type === 'text' ? systemItems[selectedIndex] : undefined}
             selectedIndex={isList ? selectedIndex : undefined}
-            onItemSelect={isList ? handleSystemSelect : undefined}
-            onBack={handleBack}
-            onEscape={openThemeSelector}
             view="system"
           />
         );
       })}
       
-      {/* 调试信息覆盖层 */}
       <DebugInfoOverlay
         themeName={themeJson.name}
         elementsCount={systemElements.length}

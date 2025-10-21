@@ -1,8 +1,6 @@
 'use client'
 import { useThemeStore } from '@/app/(main)/store/theme';
 import { Suspense, useEffect } from 'react';
-import { focusManager } from '../focusManager';
-import { ElementNavigation } from '../store/keyboard';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 declare global {
@@ -39,24 +37,10 @@ function PlayPageContent() {
             window.exitGame = () => {
                 router.push('/gamelist/' + (system || ''));
             }
-            const playElement: ElementNavigation = {
-                id: 'play-canvas',
-                type: 'play',
-                totalItems: 0,
-                selectedIndex: 0,
-                canNavigate: {
-                    up: false,
-                    down: false,
-                    left: false,
-                    right: false,
-                    select: false,
-                    back: false,
-                }
-            }
-            focusManager.registerElement(playElement);
+            // ✅ 移除 focusManager.registerElement - 不需要焦点管理
         }
     return () => {
-      focusManager.unregisterElement('play-canvas');
+      // ✅ 移除 focusManager.unregisterElement
     }
     }, [view, system, gameFile, router]);
     return (

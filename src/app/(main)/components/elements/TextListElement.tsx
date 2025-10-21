@@ -1,19 +1,13 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { useModalStore } from '@/app/(main)/store/modal';
 import { getElementDefaultProps } from '@/app/utils/themeUtils';
 import { useFontLoader } from '../../hooks/useFontLoader';
-import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 
 interface TextListElementProps {
   element: any;
   themeVariables?: any;
   items?: Array<{ name: string; [key: string]: any }>;
   selectedIndex?: number;
-  onItemSelect?: (index: number) => void;
-  onBack?: () => void;
-  onEscape?: () => void;
-  fontPath?: string;
   themeName?: string;
   view?: 'system' | 'gamelist' | 'menu';
 }
@@ -24,9 +18,6 @@ export default function TextListElement({
   themeName = '',
   items = [],
   selectedIndex: externalSelectedIndex = 0,
-  onItemSelect,
-  onBack,
-  onEscape,
   view = 'system'
 }: TextListElementProps) {
   const defaults = getElementDefaultProps('textlist');
@@ -35,29 +26,14 @@ export default function TextListElement({
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<HTMLDivElement[]>([]);
   
-  // 如果没有传入 onEscape，从 store 中获取
-  const { openThemeSelector } = useModalStore();
-  const escapeHandler = onEscape || openThemeSelector;
-  
-  // 使用键盘导航钩子
-  const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
-    elementId: `textlist-${element.name || 'default'}`,
-    elementType: 'textlist',
-    totalItems: items.length,
-    initialIndex: externalSelectedIndex,
-    onSelect: onItemSelect,
-    onEscape: escapeHandler,
-    onBack: onBack,
-    onNavigate: (direction, index) => {
-      console.log(`TextList navigated ${direction} to index ${index}`);
-    }
-  });
+  // ✅ 移除 useKeyboardNavigation Hook 调用
+  // ✅ 仅处理自己作为 UI 的职责
   
   // 当选中项改变时，滚动到该位置
   useEffect(() => {
-    if (listRef.current && itemRefs.current[selectedIndex]) {
+    if (listRef.current && itemRefs.current[externalSelectedIndex]) {
       const listElement = listRef.current;
-      const selectedItem = itemRefs.current[selectedIndex];
+      const selectedItem = itemRefs.current[externalSelectedIndex];
       
       // 计算选中项相对于列表的位置
       const itemTop = selectedItem.offsetTop;
@@ -71,7 +47,7 @@ export default function TextListElement({
         behavior: 'smooth'
       });
     }
-  }, [selectedIndex]);
+  }, [externalSelectedIndex]);
   
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
@@ -129,7 +105,6 @@ export default function TextListElement({
             key={index}
             ref={el => { if (el) itemRefs.current[index] = el; }}
             className={`p-4 cursor-pointer transition-all duration-200 relative`}
-            onClick={() => onItemSelect?.(index)}
             style={{
               height: `${lineHeight}vh`,
               marginBottom: `${lineSpacing}px`,
@@ -141,14 +116,14 @@ export default function TextListElement({
                 style={{
                   paddingLeft: `${marginL * 100}%`,
                   paddingRight: `${marginR * 100}%`,
-                  backgroundColor:index === selectedIndex ? `#${props.selectedBackgroundColor}`: 'transparent',
+                  backgroundColor: index === externalSelectedIndex ? `#${props.selectedBackgroundColor}`: 'transparent',
                   borderRadius: `${cornerRadius * 100}vw`, // 使用vw单位，更接近原始ES-DE行为
                 }}
               >
               <div 
                 className=""
                 style={{
-                  color: index === selectedIndex ? `#${props.selectedColor}` : `#${props.primaryColor}`,
+                  color: index === externalSelectedIndex ? `#${props.selectedColor}` : `#${props.primaryColor}`,
                   fontFamily: fontFamily,
                   fontSize: `${fontSize}vh`,
                   lineHeight: `${lineHeight}vh`

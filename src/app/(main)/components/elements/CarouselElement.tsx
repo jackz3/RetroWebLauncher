@@ -3,8 +3,6 @@
 import React from 'react';
 import { getElementDefaultProps } from '@/app/utils/themeUtils';
 import { useFontLoader } from '../../hooks/useFontLoader';
-import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
-import { useModalStore } from '@/app/(main)/store/modal';
 import FsImage from '@/app/(main)/components/common/FsImage';
 
 interface CarouselElementProps {
@@ -13,9 +11,6 @@ interface CarouselElementProps {
   themeName?: string;
   items?: Array<{ name: string; image?: string; system?: string; screenshot?: boolean; [key: string]: any }>;
   selectedIndex?: number;
-  onItemSelect?: (index: number) => void;
-  onBack?: () => void;
-  onEscape?: () => void;
   view?: 'system' | 'gamelist' | 'menu';
 }
 
@@ -52,31 +47,13 @@ export default function CarouselElement({
   themeName = '',
   items = [],
   selectedIndex: externalSelectedIndex = 0,
-  onItemSelect,
-  onBack,
-  onEscape,
   view = 'system',
 }: CarouselElementProps) {
   const defaults = getElementDefaultProps('carousel');
   const props = { ...defaults, ...element.properties };
   
-  // 如果没有传入 onEscape，从 store 中获取
-  const { openThemeSelector } = useModalStore();
-  const escapeHandler = onEscape || openThemeSelector;
-  
-  // 使用键盘导航钩子
-  const { selectedIndex, setSelectedIndex, isFocused } = useKeyboardNavigation({
-    elementId: `carousel-${element.name || 'default'}`,
-    elementType: 'carousel',
-    totalItems: items.length,
-    initialIndex: externalSelectedIndex,
-    onSelect: onItemSelect,
-    onBack: onBack,
-    onEscape: escapeHandler,
-    onNavigate: (direction, index) => {
-      console.log(`Carousel navigated ${direction} to index ${index}`);
-    }
-  });
+  // ✅ 移除 useKeyboardNavigation Hook 调用
+  // ✅ 仅处理自己作为 UI 的职责
   
   // 使用新的字体加载Hook
   const fontFamily = useFontLoader(props.fontPath, themeName);
@@ -138,7 +115,7 @@ export default function CarouselElement({
   const displayItems = [];
   for (let i = -half; i <= half; i++) {
     // 防御性处理：idx 必须为有效数字
-    const idx = ((selectedIndex ?? 0) + i + items.length) % items.length;
+    const idx = ((externalSelectedIndex ?? 0) + i + items.length) % items.length;
     displayItems.push({ ...items[idx], _carouselIndex: idx, _offset: i });
   }
 
@@ -202,10 +179,6 @@ export default function CarouselElement({
                 transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
                 opacity: isSelected ? 1 : unfocusedItemOpacity,
                 filter: isSelected ? 'none' : `saturate(${unfocusedItemSaturation}) brightness(${unfocusedItemDimming})`,
-              }}
-              onClick={() => {
-                setSelectedIndex(item._carouselIndex);
-                onItemSelect?.(item._carouselIndex);
               }}
             >
               {imageType === 'screenshot' && item?.screenshot && item?.system && item?.name ? (

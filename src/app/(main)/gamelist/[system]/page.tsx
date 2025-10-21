@@ -1,13 +1,12 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTheme } from '../../ThemeProvider';
 import { getViewElements } from '@/app/utils/themeUtils';
 import ElementRenderer from '../../components/ElementRenderer';
 import { useThemeStore } from '../../store/theme';
-import { useKeyboardStore } from '../../store/keyboard';
 import { useModalStore } from '../../store/modal';
-import { focusManager } from '../../focusManager';
+import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation';
 import { browserFS } from '@/app/utils/fs';
 import { oneDrive } from '@/app/utils/onedrive';
 import LoadingOverlay from '@/app/components/LoadingOverlay';
@@ -15,7 +14,7 @@ import LoadingOverlay from '@/app/components/LoadingOverlay';
 export default function GameListContent() {
   const { themeJson, selectedVariant, selectedColorScheme, selectedAspectRatio } = useTheme();
   const { setView, gameListRefreshKey } = useThemeStore();
-  const { focusedElement } = useKeyboardStore();
+  const { openThemeSelector } = useModalStore();
   const router = useRouter();
   const params = useParams<{ system?: string }>();
   const selectedSystem = typeof params?.system === 'string' ? params.system : undefined;
@@ -34,9 +33,9 @@ export default function GameListContent() {
     console.log('[GAMELIST]', msg);
   };
 
+  // 初始化视图
   useEffect(() => {
     setView('gamelist');
-    focusManager.clearFocusStack();
   }, [setView]);
 
   useEffect(() => {
@@ -126,43 +125,52 @@ export default function GameListContent() {
     };
   }, [selectedSystem, gameListRefreshKey]);
 
-  const screenshotBaseSet = new Set(
-    screenshotFiles.map((f) => {
-      const b = f.split('/').pop() || f;
-      const d = b.lastIndexOf('.');
-      return d > 0 ? b.slice(0, d) : b;
-    })
-  );
+  // ✅ 计算游戏列表
+  const gameList = useMemo(() => {
+    const screenshotBaseSet = new Set(
+      screenshotFiles.map((f) => {
+        const b = f.split('/').pop() || f;
+        const d = b.lastIndexOf('.');
+        return d > 0 ? b.slice(0, d) : b;
+      })
+    );
 
-  const gameList = gameFiles.map((file) => {
-    const base = file.split('/').pop() || file;
-    const dot = base.lastIndexOf('.');
-    const name = dot > 0 ? base.slice(0, dot) : base;
-    const hasScreenshot = screenshotBaseSet.has(name);
-    return {
-      name,
-      file,
-      system: selectedSystem || '',
-      screenshot: hasScreenshot,
-    };
+    return gameFiles.map((file) => {
+      const base = file.split('/').pop() || file;
+      const dot = base.lastIndexOf('.');
+      const name = dot > 0 ? base.slice(0, dot) : base;
+      const hasScreenshot = screenshotBaseSet.has(name);
+
+      return {
+        name,
+        file,
+        system: selectedSystem || '',
+        screenshot: hasScreenshot,
+      };
+    });
+  }, [gameFiles, screenshotFiles, selectedSystem]);
+
+  // ✅ 键盘导航 Hook
+  const { selectedIndex } = useKeyboardNavigation({
+    elementType: 'textlist',
+    totalItems: gameList.length,
+    initialIndex: 0,
+    isEnabled: !loading,
+    onSelect: (index) => {
+      const selectedGame = gameList[index];
+      console.log('Selected Game:', selectedGame);
+      router.push(`/play?s=${selectedGame.system}&g=${selectedGame.file}`);
+    },
+    onBack: () => {
+      router.push('/system');
+    },
+    onEscape: openThemeSelector
   });
-
-  const handleBack = () => {
-    router.push('/system');
-  };
-
-  const handleGameSelect = (index: number) => {
-    const selectedGame = gameList[index];
-    console.log('Selected Game:', selectedGame);
-
-    router.push(`/play?s=${selectedGame.system}&g=${selectedGame.file}`);
-  };
-
-  const { openThemeSelector } = useModalStore();
 
   if (!themeJson || !selectedVariant || !selectedAspectRatio) {
     return <div>Loading...</div>;
   }
+  
   const { elements: gamelistElements, variables: mergedThemeVariables } = getViewElements(
     themeJson,
     'gamelist',
@@ -181,7 +189,6 @@ export default function GameListContent() {
       />
       {gamelistElements.map((element: any) => {
         const isList = element.type === 'textlist' || element.type === 'carousel' || element.type === 'grid';
-        const selectedIndex = focusedElement?.selectedIndex ?? 0;
         const selectedGame = gameList[selectedIndex] || gameList[0];
 
         return (
@@ -192,9 +199,7 @@ export default function GameListContent() {
             themeName={themeJson.name}
             items={gameList}
             item={element.type === 'text' ? selectedGame : undefined}
-            onItemSelect={isList ? handleGameSelect : undefined}
-            onBack={handleBack}
-            onEscape={openThemeSelector}
+            selectedIndex={isList ? selectedIndex : undefined}
             view="gamelist"
           />
         );
